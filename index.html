@@ -1663,10 +1663,148 @@
             color: var(--text-medium);
             line-height: 1.5;
         }
+
+        /* ============ TOASTS ============ */
+        .toast-container {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: calc(100% - 24px);
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 24px rgba(20, 41, 67, 0.16);
+            padding: 12px 12px 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-left: 4px solid var(--navy);
+            font-size: 13.5px;
+            color: var(--text-dark);
+            line-height: 1.45;
+            white-space: pre-line;
+            pointer-events: auto;
+            animation: toast-in 0.22s ease-out;
+            word-wrap: break-word;
+        }
+        .toast.leaving { animation: toast-out 0.2s ease-in forwards; }
+        .toast .toast-icon { flex-shrink: 0; font-size: 18px; margin-top: 1px; }
+        .toast .toast-message { flex: 1; min-width: 0; }
+        .toast .toast-close {
+            flex-shrink: 0;
+            background: none;
+            border: 0;
+            padding: 0 4px;
+            font-size: 16px;
+            color: var(--text-light);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .toast.toast-success { border-left-color: var(--success); }
+        .toast.toast-success .toast-icon { color: var(--success); }
+        .toast.toast-error { border-left-color: var(--danger); }
+        .toast.toast-error .toast-icon { color: var(--danger); }
+        .toast.toast-warning { border-left-color: var(--orange); }
+        .toast.toast-warning .toast-icon { color: var(--orange); }
+        .toast.toast-info { border-left-color: var(--navy); }
+        .toast.toast-info .toast-icon { color: var(--navy); }
+
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toast-out {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* ============ CONFIRM MODAL ============ */
+        .confirm-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 41, 67, 0.5);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .confirm-modal.active { display: flex; }
+        .confirm-modal-box {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 12px 32px rgba(20, 41, 67, 0.3);
+            animation: confirm-in 0.18s ease-out;
+        }
+        @keyframes confirm-in {
+            from { opacity: 0; transform: scale(0.94); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .confirm-modal-title {
+            font-family: var(--font-display);
+            font-size: 16.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+        .confirm-modal-message {
+            font-size: 13.5px;
+            color: var(--text-medium);
+            line-height: 1.5;
+            margin-bottom: 18px;
+            white-space: pre-line;
+        }
+        .confirm-modal-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .confirm-modal-actions button {
+            flex: 1;
+            padding: 11px 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+        }
+        .confirm-btn-cancel {
+            background: var(--white);
+            color: var(--text-medium);
+            border: 1.5px solid var(--border);
+        }
+        .confirm-btn-ok {
+            background: var(--navy);
+            color: var(--white);
+            border: 0;
+        }
+        .confirm-btn-ok.danger { background: var(--danger); }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 </head>
 <body>
+    <!-- Toasts + confirm modal (globaux, montés une seule fois) -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+    <div id="confirm-modal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div class="confirm-modal-box">
+            <div class="confirm-modal-title" id="confirm-modal-title"></div>
+            <div class="confirm-modal-message" id="confirm-modal-message"></div>
+            <div class="confirm-modal-actions">
+                <button type="button" class="confirm-btn-cancel" id="confirm-modal-cancel">Annuler</button>
+                <button type="button" class="confirm-btn-ok" id="confirm-modal-ok">Confirmer</button>
+            </div>
+        </div>
+    </div>
     <div class="desktop-brand-panel">
         <div class="brand-mark-lg">
             <div class="logo-circle-lg"><span>B</span></div>
@@ -2249,6 +2387,84 @@
         // Compresse une image côté client : redimensionne à maxWidth px et
         // ré-encode en JPEG à la qualité donnée. Objectif : ~100-300 KB par photo
         // pour rester utilisable sur les réseaux 3G/4G congolais.
+        // ============================================
+        // Toasts & confirm (remplacent alert / confirm natifs)
+        // ============================================
+        const TOAST_ICONS = {
+            success: 'ti-circle-check',
+            error: 'ti-alert-circle',
+            warning: 'ti-alert-triangle',
+            info: 'ti-info-circle'
+        };
+
+        function showToast(message, type = 'info', duration = 3500) {
+            const container = document.getElementById('toast-container');
+            if (!container) { console.log('[toast]', message); return; }
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const iconClass = TOAST_ICONS[type] || TOAST_ICONS.info;
+            toast.innerHTML = `
+                <i class="ti ${iconClass} toast-icon" aria-hidden="true"></i>
+                <div class="toast-message"></div>
+                <button type="button" class="toast-close" aria-label="Fermer">×</button>
+            `;
+            toast.querySelector('.toast-message').textContent = message;
+
+            const dismiss = () => {
+                if (toast.classList.contains('leaving')) return;
+                toast.classList.add('leaving');
+                setTimeout(() => toast.remove(), 200);
+            };
+            toast.querySelector('.toast-close').addEventListener('click', dismiss);
+            container.appendChild(toast);
+            if (duration > 0) setTimeout(dismiss, duration);
+        }
+
+        // Renvoie une promesse qui résout true si l'utilisateur confirme, false sinon.
+        // options : { title, message, okLabel, cancelLabel, danger }
+        function showConfirm(options) {
+            if (typeof options === 'string') options = { message: options };
+            const {
+                title = 'Confirmer',
+                message = '',
+                okLabel = 'Confirmer',
+                cancelLabel = 'Annuler',
+                danger = false
+            } = options;
+
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirm-modal');
+                const titleEl = document.getElementById('confirm-modal-title');
+                const messageEl = document.getElementById('confirm-modal-message');
+                const okBtn = document.getElementById('confirm-modal-ok');
+                const cancelBtn = document.getElementById('confirm-modal-cancel');
+
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+                okBtn.textContent = okLabel;
+                cancelBtn.textContent = cancelLabel;
+                okBtn.classList.toggle('danger', !!danger);
+
+                const cleanup = (result) => {
+                    modal.classList.remove('active');
+                    okBtn.removeEventListener('click', onOk);
+                    cancelBtn.removeEventListener('click', onCancel);
+                    modal.removeEventListener('click', onBackdrop);
+                    resolve(result);
+                };
+                const onOk = () => cleanup(true);
+                const onCancel = () => cleanup(false);
+                const onBackdrop = (e) => { if (e.target === modal) cleanup(false); };
+
+                okBtn.addEventListener('click', onOk);
+                cancelBtn.addEventListener('click', onCancel);
+                modal.addEventListener('click', onBackdrop);
+                modal.classList.add('active');
+                okBtn.focus();
+            });
+        }
+
         async function compressImage(file, maxWidth = 1600, quality = 0.82) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2317,7 +2533,7 @@
 
             // Garde-fou côté client (le bucket a aussi une limite serveur)
             if (file.size > 5 * 1024 * 1024) {
-                alert('Cette photo dépasse 5 Mo. Merci d\'en choisir une plus légère.');
+                showToast('Cette photo dépasse 5 Mo. Merci d\'en choisir une plus légère.', 'warning');
                 input.value = '';
                 return;
             }
@@ -2396,7 +2612,7 @@
             const city = cities[cityKey];
 
             if (!city.active) {
-                alert(`🔔 ${city.name} sera bientôt disponible !\n\nBamsGo arrive prochainement dans votre ville.\n\nEn attendant, découvrez nos services à Kolwezi ! 🚀`);
+                showToast(`${city.name} sera bientôt disponible sur BamsGo.`, 'info');
                 return;
             }
 
@@ -2704,11 +2920,15 @@
 
         // Logout
         async function logout() {
-            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-                await supabaseClient.auth.signOut();
-                currentUser = null;
-                showAuthPage();
-            }
+            const ok = await showConfirm({
+                title: 'Se déconnecter',
+                message: 'Voulez-vous vraiment vous déconnecter de BamsGo ?',
+                okLabel: 'Se déconnecter'
+            });
+            if (!ok) return;
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            showAuthPage();
         }
 
         // Navigation Functions
@@ -2756,7 +2976,7 @@
 
         async function showMessages() {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour voir vos messages');
+                showToast('Connectez-vous pour voir vos messages.', 'info');
                 return;
             }
             
@@ -2878,7 +3098,7 @@
 
         async function showMyListings() {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour voir vos annonces');
+                showToast('Connectez-vous pour voir vos annonces.', 'info');
                 return;
             }
 
@@ -2953,7 +3173,13 @@
         }
 
         async function deleteMyListing(listingId) {
-            if (!confirm('Supprimer définitivement cette annonce ?')) return;
+            const ok = await showConfirm({
+                title: 'Supprimer cette annonce ?',
+                message: 'Cette action est définitive. L\'annonce et ses avis seront effacés.',
+                okLabel: 'Supprimer',
+                danger: true
+            });
+            if (!ok) return;
 
             const { error } = await supabaseClient
                 .from('listings')
@@ -2961,7 +3187,7 @@
                 .eq('id', listingId);
 
             if (error) {
-                alert('Erreur lors de la suppression : ' + error.message);
+                showToast('Erreur lors de la suppression : ' + error.message, 'error');
                 return;
             }
 
@@ -2973,7 +3199,7 @@
 
         async function showFavorites() {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour voir vos favoris');
+                showToast('Connectez-vous pour voir vos favoris.', 'info');
                 return;
             }
 
@@ -3089,7 +3315,7 @@
 
         async function toggleFavorite(listingId, isCurrentlyFavorite) {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour ajouter des favoris');
+                showToast('Connectez-vous pour ajouter des favoris.', 'info');
                 return;
             }
 
@@ -3228,7 +3454,7 @@
 
         function showSettings() {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour accéder aux paramètres');
+                showToast('Connectez-vous pour accéder aux paramètres.', 'info');
                 return;
             }
 
@@ -3465,12 +3691,12 @@
         // Modal Functions
         function openPostModal(type) {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour publier une annonce');
+                showToast('Connectez-vous pour publier une annonce.', 'info');
                 return;
             }
 
             if (currentUser.type === 'client' && type === 'service') {
-                alert('Seuls les prestataires peuvent publier des services.\n\nVous pouvez publier des locations d\'équipement.');
+                showToast('Seuls les prestataires peuvent publier des services. Vous pouvez publier des locations d\'équipement.', 'warning');
                 return;
             }
 
@@ -3565,7 +3791,7 @@
                         if (!phone || phone.trim().length < 10) errors.push('❌ Numéro de téléphone invalide');
                         
                         if (errors.length > 0) {
-                            alert('⚠️ ERREURS DE VALIDATION :\n\n' + errors.join('\n'));
+                            showToast(errors.join('\n'), 'error', 5000);
                             return;
                         }
                         
@@ -3599,7 +3825,7 @@
                         if (!phone || phone.trim().length < 10) errors.push('❌ Numéro de téléphone invalide');
                         
                         if (errors.length > 0) {
-                            alert('⚠️ ERREURS DE VALIDATION :\n\n' + errors.join('\n'));
+                            showToast(errors.join('\n'), 'error', 5000);
                             return;
                         }
                         
@@ -3629,7 +3855,7 @@
                             if (photoUrl) newListing.photo_url = photoUrl;
                         } catch (photoErr) {
                             console.error('Upload photo échoué:', photoErr);
-                            alert('❌ Échec de l\'upload de la photo. Réessayez, ou publiez sans photo.');
+                            showToast('Échec de l\'upload de la photo. Réessayez, ou publiez sans photo.', 'error');
                             if (submitBtn) submitBtn.disabled = false;
                             return;
                         }
@@ -3642,7 +3868,7 @@
                         .single();
 
                     if (error) {
-                        alert('❌ ERREUR !\n\nImpossible de publier l\'annonce.\n\nDétails : ' + error.message);
+                        showToast('Impossible de publier l\'annonce : ' + error.message, 'error', 5000);
                         if (submitBtn) submitBtn.disabled = false;
                         return;
                     }
@@ -3665,7 +3891,7 @@
                     
                     if (submitBtn) submitBtn.disabled = false;
                     closeModal();
-                    alert('✅ SUCCÈS !\n\nVotre annonce a été publiée avec succès !');
+                    showToast('Votre annonce a été publiée !', 'success');
                     
                     if (currentCategory) {
                         renderListings();
@@ -3673,7 +3899,7 @@
                     
                 } catch (error) {
                     console.error('Error submitting form:', error);
-                    alert('❌ ERREUR !\n\nUne erreur est survenue lors de la publication.\n\nDétails : ' + error.message);
+                    showToast('Une erreur est survenue lors de la publication : ' + error.message, 'error', 5000);
                     if (submitBtn) submitBtn.disabled = false;
                 }
             });
@@ -3767,9 +3993,9 @@
 
         function copyPhoneNumber(phone) {
             navigator.clipboard.writeText(phone).then(() => {
-                alert('Numéro copié : ' + phone);
+                showToast('Numéro copié : ' + phone, 'success');
             }).catch(() => {
-                alert('Numéro : ' + phone);
+                showToast('Numéro : ' + phone, 'info');
             });
         }
 
@@ -3996,7 +4222,7 @@
         // Show notifications panel
         async function showNotifications() {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour voir vos notifications');
+                showToast('Connectez-vous pour voir vos notifications.', 'info');
                 return;
             }
             
@@ -4127,7 +4353,7 @@
         // Open rating modal
         function openRatingModal(listingId) {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour noter ce service');
+                showToast('Connectez-vous pour noter ce service.', 'info');
                 return;
             }
 
@@ -4243,7 +4469,7 @@
                 // Check if at least one criterion is rated
                 const hasRating = Object.values(currentRatings).some(v => v > 0);
                 if (!hasRating) {
-                    alert('Veuillez noter au moins un critère');
+                    showToast('Veuillez noter au moins un critère.', 'warning');
                     return;
                 }
 
@@ -4277,7 +4503,7 @@
                     }, { onConflict: 'listing_id,user_id' });
 
                 if (error) {
-                    alert('❌ Erreur lors de l\'envoi de l\'avis : ' + error.message);
+                    showToast('Erreur lors de l\'envoi de l\'avis : ' + error.message, 'error');
                     if (submitBtn) submitBtn.disabled = false;
                     return;
                 }
