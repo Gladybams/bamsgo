@@ -168,8 +168,14 @@
                 min-height: 780px;
                 max-height: 92vh;
                 overflow-y: auto;
+                overflow-x: hidden;
                 position: relative;
                 z-index: 1;
+                isolation: isolate;
+            }
+
+            .main-header {
+                border-radius: 32px 32px 0 0;
             }
         }
 
@@ -222,6 +228,13 @@
             display: flex;
             flex-direction: column;
             padding: 0;
+        }
+
+        @media (min-width: 860px) {
+            #auth-page {
+                min-height: 780px;
+                border-radius: 32px;
+            }
         }
 
         .auth-hero {
@@ -891,6 +904,16 @@
             align-items: center;
             padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
             z-index: 40;
+        }
+
+        @media (min-width: 860px) {
+            .bottom-nav {
+                position: sticky;
+                left: auto;
+                transform: none;
+                margin-top: auto;
+                border-radius: 0 0 32px 32px;
+            }
         }
 
         .nav-item {
