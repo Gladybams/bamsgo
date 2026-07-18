@@ -2925,10 +2925,10 @@
                         <div class="listing-card ${listing.photo_url ? 'has-photo' : ''}">
                             ${renderPhotoStrip(listing)}
                             <div class="listing-inner">
-                                <div class="listing-image">
+                                <div class="listing-image" onclick="openListingDetail(${listing.id})">
                                     <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
                                 </div>
-                                <div class="listing-content">
+                                <div class="listing-content" onclick="openListingDetail(${listing.id})" style="cursor:pointer;">
                                     <h3 class="listing-title">${listing.name}</h3>
                                     <div class="listing-meta">
                                         <div class="listing-location"><i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i><span>${listing.quartier}</span></div>
@@ -2939,7 +2939,7 @@
                                     <div class="listing-footer">
                                         <div class="listing-price">${listing.price}</div>
                                         <div style="display:flex;gap:8px;">
-                                            <button class="btn-contact" style="background:var(--white);color:var(--navy);border:1.5px solid var(--border);" onclick="deleteMyListing(${listing.id})">
+                                            <button class="btn-contact" style="background:var(--white);color:var(--navy);border:1.5px solid var(--border);" onclick="event.stopPropagation(); deleteMyListing(${listing.id})">
                                                 <i class="ti ti-trash" style="font-size:14px;" aria-hidden="true"></i>
                                             </button>
                                         </div>
