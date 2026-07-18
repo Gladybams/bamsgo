@@ -1,0 +1,3864 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#E85D04">
+    <meta name="description" content="BamsGo - La marketplace de services et locations partout au Congo">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BamsGo">
+    <title>BamsGo - Services & Location au Congo</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="BamsGo-logo-transparent.png">
+    <link rel="apple-touch-icon" href="BamsGo-logo-transparent.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --primary-dark: #DC2F02;
+            --primary-light: #F48C06;
+            --secondary: #0A9396;
+            --secondary-dark: #005F73;
+            --accent: #FBBF24;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --bg: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-dark: #1A1A2E;
+            --text-medium: #6B7280;
+            --text-light: #9CA3AF;
+            --border: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* App Container */
+        .app-container {
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Status Bar - REMOVED */
+        .status-bar {
+            display: none;
+        }
+
+        /* App Header */
+        .app-header {
+            padding: 1rem 1.25rem;
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--bg);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: var(--border);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-info:hover {
+            background: var(--border);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-dark);
+        }
+
+        .user-type {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+        }
+
+        .user-type-badge {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .user-type-badge.client {
+            background: var(--secondary);
+        }
+
+        /* Desktop Actions */
+        .desktop-actions {
+            display: none;
+            gap: 0.75rem;
+        }
+
+        .btn-desktop {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary-desktop {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary-desktop:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary-desktop {
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary-desktop:hover {
+            background: var(--border);
+        }
+
+        /* Location Badge */
+        .location-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            border-radius: 50px;
+            width: fit-content;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .location-badge:hover {
+            background: var(--border);
+        }
+
+        .city-selector {
+            position: relative;
+            display: inline-block;
+        }
+
+        .city-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 250px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        .city-dropdown.active {
+            display: block;
+        }
+
+        .city-dropdown-item {
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .city-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .city-dropdown-item:hover {
+            background: var(--bg);
+        }
+
+        .city-dropdown-item.active {
+            background: rgba(232, 93, 4, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .city-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .city-name {
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+
+        .city-status {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .city-status.active {
+            color: var(--success);
+        }
+
+        .city-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .city-badge.active {
+            background: var(--success);
+            color: white;
+        }
+
+        .city-badge.soon {
+            background: var(--accent);
+            color: var(--text-dark);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tabs */
+        .tabs-container {
+            padding: 1rem 1.25rem;
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            background: var(--bg);
+            padding: 0.375rem;
+            border-radius: 12px;
+        }
+
+        .tab {
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Content */
+        .content {
+            padding: 1rem 1.25rem 1rem;
+            background: var(--bg);
+            min-height: calc(100vh - 400px);
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .see-all {
+            font-size: 0.875rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .see-all:hover {
+            text-decoration: underline;
+        }
+
+        /* Categories Scroll */
+        .categories-scroll {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 80px;
+            padding: 1rem 0.75rem;
+            background: white;
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-chip:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .category-chip:active {
+            transform: scale(0.95);
+        }
+
+        .category-chip.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(232, 93, 4, 0.05), rgba(232, 93, 4, 0.1));
+        }
+
+        .category-chip-icon {
+            font-size: 2rem;
+        }
+
+        .category-chip-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Listings */
+        .listings-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .listing-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .listing-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .listing-card:active {
+            transform: scale(0.98);
+        }
+
+        .listing-image {
+            height: 140px;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+        }
+
+        .listing-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .listing-content {
+            padding: 1rem;
+        }
+
+        .listing-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.375rem;
+        }
+
+        .listing-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .listing-location {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8125rem;
+            color: var(--text-medium);
+        }
+
+        .listing-separator {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--text-light);
+        }
+
+        .listing-type {
+            font-size: 0.8125rem;
+            color: var(--text-medium);
+        }
+
+        .listing-description {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .listing-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .listing-price {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .btn-contact {
+            padding: 0.625rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-contact:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .btn-contact:active {
+            transform: scale(0.95);
+        }
+
+        /* Bottom Navigation - TOUJOURS VISIBLE */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.25rem;
+            z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 0.25rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--bg);
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+
+        .nav-item.active {
+            background: rgba(232, 93, 4, 0.08);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--text-medium);
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--primary);
+        }
+
+        /* FAB Button */
+        .fab {
+            position: fixed;
+            bottom: calc(5rem + env(safe-area-inset-bottom));
+            right: 1.25rem;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.75rem;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(232, 93, 4, 0.4);
+            z-index: 99;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(232, 93, 4, 0.5);
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-header {
+            padding: 1.5rem 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-required {
+            color: var(--primary);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9375rem;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 93, 4, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        .empty-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-text {
+            font-size: 0.9375rem;
+            color: var(--text-medium);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-medium);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary-light);
+        }
+
+        .filter-chip:active {
+            transform: scale(0.95);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Login/Account Pages */
+        .auth-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem 1.25rem;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-medium);
+        }
+
+        .account-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .account-type-card {
+            padding: 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .account-type-card:hover {
+            border-color: var(--primary-light);
+        }
+
+        .account-type-card.selected {
+            border-color: var(--primary);
+            background: rgba(232, 93, 4, 0.05);
+        }
+
+        .account-type-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .account-type-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .account-type-desc {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Account Page */
+        .account-page {
+            padding-bottom: 1rem;
+        }
+
+        .account-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+        }
+
+        .menu-list {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .menu-item {
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: var(--bg);
+        }
+
+        .menu-item:active {
+            transform: scale(0.98);
+        }
+
+        .menu-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+
+        .menu-content {
+            flex: 1;
+        }
+
+        .menu-title {
+            font-weight: 600;
+            margin-bottom: 0.125rem;
+        }
+
+        .menu-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-medium);
+        }
+
+        .menu-arrow {
+            color: var(--text-light);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); }
+            to { transform: translate(-50%, 0); }
+        }
+
+        /* Desktop Responsive */
+        @media (min-width: 768px) {
+            .content {
+                padding: 2rem;
+            }
+
+            .listings-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .categories-scroll {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                overflow-x: visible;
+            }
+
+            .category-chip {
+                min-width: auto;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                background: #E5E7EB;
+            }
+
+            .app-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+            }
+
+            .status-bar {
+                display: none;
+            }
+
+            .bottom-nav {
+                display: none;
+            }
+
+            .fab {
+                display: none;
+            }
+
+            .desktop-actions {
+                display: flex;
+            }
+
+            .app-header {
+                padding: 1.5rem 3rem;
+            }
+
+            .header-top {
+                margin-bottom: 1.5rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .tabs-container {
+                padding: 1.5rem 3rem;
+            }
+
+            .tabs {
+                max-width: 400px;
+            }
+
+            .content {
+                padding: 2rem 3rem 3rem;
+            }
+
+            .listings-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+
+            .section-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .categories-scroll {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 1rem;
+            }
+
+            .category-chip {
+                padding: 1.5rem 1rem;
+            }
+
+            .modal {
+                top: 50%;
+                bottom: auto;
+                transform: translate(-50%, -50%);
+                border-radius: 24px;
+                max-width: 600px;
+            }
+
+            .modal.active {
+                animation: scaleIn 0.3s ease;
+            }
+
+            @keyframes scaleIn {
+                from {
+                    transform: translate(-50%, -50%) scale(0.9);
+                    opacity: 0;
+                }
+                to {
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .modal-handle {
+                display: none;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .listings-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Hide elements initially */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Rating System Styles */
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .rating-stars {
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+        }
+
+        .rating-value {
+            color: var(--text-dark);
+        }
+
+        .rating-count {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .top-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            color: white;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+
+        /* Rating Modal */
+        .rating-modal {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 1002;
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        .rating-modal.active {
+            display: block;
+        }
+
+        .rating-modal-header {
+            padding: 1.5rem 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .rating-modal-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-modal-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+        }
+
+        .rating-modal-body {
+            padding: 1.25rem;
+        }
+
+        .rating-criteria {
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-criterion {
+            margin-bottom: 1.5rem;
+        }
+
+        .criterion-label {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .star {
+            font-size: 2.5rem;
+            color: var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .star:hover,
+        .star.active {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .star:active {
+            transform: scale(0.95);
+        }
+
+        .rating-comment {
+            margin-bottom: 1rem;
+        }
+
+        .comment-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .comment-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9375rem;
+            resize: vertical;
+            transition: all 0.2s;
+        }
+
+        .comment-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .comment-counter {
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .quick-tag {
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .quick-tag:active {
+            transform: scale(0.95);
+        }
+
+        .quick-tag.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .btn-submit-rating {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-submit-rating:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 93, 4, 0.3);
+        }
+
+        .btn-submit-rating:active {
+            transform: scale(0.98);
+        }
+
+        .btn-submit-rating:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .rating-success {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .success-text {
+            font-size: 0.9375rem;
+            color: var(--text-medium);
+        }
+
+        /* Desktop Rating Modal */
+        @media (min-width: 1024px) {
+            .rating-modal {
+                top: 50%;
+                bottom: auto;
+                transform: translate(-50%, -50%);
+                border-radius: 24px;
+                max-width: 600px;
+            }
+
+            .rating-modal.active {
+                animation: scaleIn 0.3s ease;
+            }
+        }
+
+        /* Notifications Panel */
+        .notifications-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1003;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notifications-panel.active {
+            right: 0;
+        }
+
+        .notifications-header {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .notifications-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .btn-close-notifications {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .btn-close-notifications:hover {
+            background: var(--border);
+        }
+
+        .notifications-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .notification-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .notification-item:hover {
+            background: var(--bg);
+        }
+
+        .notification-item.unread {
+            background: rgba(232, 93, 4, 0.05);
+        }
+
+        .notification-icon {
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            font-size: 0.9375rem;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            flex-shrink: 0;
+            margin-top: 0.5rem;
+        }
+
+        .empty-notifications {
+            padding: 3rem 1.25rem;
+            text-align: center;
+        }
+
+        .empty-notifications-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-notifications-text {
+            color: var(--text-medium);
+            font-size: 0.9375rem;
+        }
+
+        .notifications-footer {
+            padding: 1rem 1.25rem;
+            border-top: 2px solid var(--border);
+            background: white;
+        }
+
+        .btn-mark-all-read {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-mark-all-read:hover {
+            background: var(--border);
+        }
+
+        .btn-mark-all-read:active {
+            transform: scale(0.98);
+        }
+
+        @media (min-width: 768px) {
+            .notifications-panel {
+                max-width: 420px;
+            }
+        }
+
+        /* Reviews Detail Modal */
+        .reviews-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: white;
+            z-index: 1004;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .reviews-modal.active {
+            display: flex;
+        }
+
+        .reviews-modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .btn-back-reviews {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .btn-back-reviews:hover {
+            background: var(--border);
+        }
+
+        .reviews-modal-title {
+            flex: 1;
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .reviews-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+        }
+
+        .reviews-summary {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .reviews-overall-rating {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .reviews-overall-stars {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .reviews-overall-count {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+        }
+
+        .reviews-criteria {
+            margin-bottom: 2rem;
+        }
+
+        .reviews-criteria-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .criteria-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .criteria-label {
+            flex: 1;
+            font-size: 0.875rem;
+            color: var(--text-medium);
+        }
+
+        .criteria-bar-container {
+            flex: 2;
+            height: 8px;
+            background: var(--border);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .criteria-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--warning));
+            border-radius: 50px;
+            transition: width 0.3s ease;
+        }
+
+        .criteria-value {
+            width: 50px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-dark);
+        }
+
+        .reviews-list-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .review-item {
+            padding: 1.25rem;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .review-user {
+            font-weight: 700;
+            font-size: 0.9375rem;
+            color: var(--text-dark);
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .review-stars {
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .review-value {
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-dark);
+        }
+
+        .review-comment {
+            font-size: 0.9375rem;
+            color: var(--text-dark);
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .review-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .review-tag {
+            padding: 0.375rem 0.75rem;
+            background: rgba(232, 93, 4, 0.1);
+            color: var(--primary);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .review-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .no-reviews-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .no-reviews-text {
+            font-size: 0.9375rem;
+            color: var(--text-medium);
+        }
+
+        @media (min-width: 768px) {
+            .reviews-modal {
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                max-width: 700px;
+                height: 85vh;
+                border-radius: 24px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+
+            .reviews-modal-header {
+                border-radius: 24px 24px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-time" id="current-time">9:41</div>
+            <div class="status-icons">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- Login/Register Page -->
+        <div id="auth-page" class="hidden">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
+                        <img src="BamsGo-horizontal.png" alt="BamsGo" style="height: 60px;">
+                    </div>
+                    <h1>Bienvenue !</h1>
+                    <p id="auth-subtitle">Choisissez votre type de compte</p>
+                </div>
+
+                <div class="account-type-selector" id="account-type-selector">
+                    <div class="account-type-card" data-type="client" onclick="selectAccountType('client')">
+                        <div class="account-type-icon">👤</div>
+                        <div class="account-type-title">Client</div>
+                        <div class="account-type-desc">Trouver des services</div>
+                    </div>
+                    <div class="account-type-card" data-type="prestataire" onclick="selectAccountType('prestataire')">
+                        <div class="account-type-icon">💼</div>
+                        <div class="account-type-title">Prestataire</div>
+                        <div class="account-type-desc">Proposer mes services</div>
+                    </div>
+                </div>
+
+                <form id="auth-form">
+                    <div class="form-group">
+                        <label class="form-label">Nom complet <span class="form-required">*</span></label>
+                        <input type="text" class="form-input" id="auth-name" required placeholder="Ex: Jean Kabamba">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Numéro de téléphone <span class="form-required">*</span></label>
+                        <input type="tel" class="form-input" id="auth-phone" required placeholder="+243 XXX XXX XXX">
+                    </div>
+
+                    <div class="form-group" id="prestataire-fields" style="display: none;">
+                        <label class="form-label">Spécialité <span class="form-required">*</span></label>
+                        <select class="form-select" id="auth-specialty">
+                            <option value="">Sélectionnez votre spécialité</option>
+                            <option value="depannage">Dépannage & Urgences</option>
+                            <option value="auto">Auto, Mécanique & Transport</option>
+                            <option value="btp">BTP & Travaux</option>
+                            <option value="beaute">Beauté & Événements</option>
+                            <option value="maison">Services à domicile</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Créer mon compte</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main App (Hidden until logged in) -->
+        <div id="main-app" class="hidden">
+            <!-- App Header -->
+            <div class="app-header">
+                <div class="header-top">
+                    <div class="logo">
+                        <img src="BamsGo-horizontal.png" alt="BamsGo" style="height: 36px;">
+                    </div>
+                    <div class="header-actions">
+                        <!-- Mobile Actions -->
+                        <button class="icon-btn" onclick="showNotifications()">
+                            🔔
+                            <span class="badge">3</span>
+                        </button>
+                        <button class="icon-btn" onclick="showAccountPage()">👤</button>
+                        
+                        <!-- Desktop Actions -->
+                        <div class="desktop-actions">
+                            <button class="btn-desktop btn-secondary-desktop" onclick="showNotifications()">
+                                <span>🔔</span>
+                                <span>Notifications</span>
+                            </button>
+                            <button class="btn-desktop btn-secondary-desktop" onclick="showAccountPage()">
+                                <span>👤</span>
+                                <span>Mon compte</span>
+                            </button>
+                            <button class="btn-desktop btn-primary-desktop" onclick="openPostModal('service')">
+                                <span>➕</span>
+                                <span>Publier une annonce</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="city-selector">
+                    <div class="location-badge" onclick="toggleCityDropdown()">
+                        <span>📍</span>
+                        <span id="current-city">Kolwezi</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="city-dropdown" id="city-dropdown">
+                        <!-- Cities loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('services')" id="tab-services">
+                        🔧 Services
+                    </button>
+                    <button class="tab" onclick="switchTab('location')" id="tab-location">
+                        🪑 Location
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Categories View -->
+                <div id="categories-view">
+                    <div class="section-header">
+                        <h2 class="section-title">Catégories</h2>
+                    </div>
+                    <div class="categories-scroll" id="categories-scroll">
+                        <!-- Categories loaded here -->
+                    </div>
+                </div>
+
+                <!-- Listings View -->
+                <div id="listings-view" style="display: none;">
+                    <div class="filter-bar" id="filter-bar">
+                        <button class="filter-chip active" onclick="filterQuartier('')">Tous</button>
+                        <button class="filter-chip" onclick="filterQuartier('Manika')">Manika</button>
+                        <button class="filter-chip" onclick="filterQuartier('Dilala')">Dilala</button>
+                        <button class="filter-chip" onclick="filterQuartier('Musonoi')">Musonoi</button>
+                        <button class="filter-chip" onclick="filterQuartier('Gécamines')">Gécamines</button>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2 class="section-title" id="listings-title">Annonces récentes</h2>
+                        <a class="see-all" onclick="showCategories()">← Retour aux catégories</a>
+                    </div>
+                    
+                    <div class="listings-grid" id="listings-grid">
+                        <!-- Listings loaded here -->
+                    </div>
+                    
+                    <div class="empty-state" id="empty-state" style="display: none;">
+                        <div class="empty-icon">📭</div>
+                        <h3 class="empty-title">Aucune annonce</h3>
+                        <p class="empty-text">Soyez le premier à publier !</p>
+                    </div>
+                </div>
+
+                <!-- Account Page -->
+                <div id="account-page" class="account-page" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">Mon compte</h2>
+                    </div>
+
+                    <div class="user-info" style="margin-bottom: 1.5rem; pointer-events: none;">
+                        <div class="user-avatar" id="account-avatar">J</div>
+                        <div class="user-details">
+                            <div class="user-name" id="account-name">Jean Kabamba</div>
+                            <span class="user-type-badge" id="account-type-badge">Client</span>
+                        </div>
+                    </div>
+
+                    <div class="account-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-annonces">0</div>
+                            <div class="stat-label">Annonces</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-favoris">0</div>
+                            <div class="stat-label">Favoris</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-contacts">0</div>
+                            <div class="stat-label">Contacts</div>
+                        </div>
+                    </div>
+
+                    <div class="menu-list">
+                        <div class="menu-item" onclick="alert('📝 Mes annonces : Fonctionnalité à venir')">
+                            <div class="menu-icon">📝</div>
+                            <div class="menu-content">
+                                <div class="menu-title">Mes annonces</div>
+                                <div class="menu-subtitle">Gérer mes publications</div>
+                            </div>
+                            <div class="menu-arrow">›</div>
+                        </div>
+                        <div class="menu-item" onclick="alert('⭐ Favoris : Fonctionnalité à venir')">
+                            <div class="menu-icon">⭐</div>
+                            <div class="menu-content">
+                                <div class="menu-title">Favoris</div>
+                                <div class="menu-subtitle">Annonces sauvegardées</div>
+                            </div>
+                            <div class="menu-arrow">›</div>
+                        </div>
+                        <div class="menu-item" onclick="showMessages()">
+                            <div class="menu-icon">📞</div>
+                            <div class="menu-content">
+                                <div class="menu-title">Historique</div>
+                                <div class="menu-subtitle">Mes contacts récents</div>
+                            </div>
+                            <div class="menu-arrow">›</div>
+                        </div>
+                        <div class="menu-item" onclick="alert('⚙️ Paramètres : Fonctionnalité à venir')">
+                            <div class="menu-icon">⚙️</div>
+                            <div class="menu-content">
+                                <div class="menu-title">Paramètres</div>
+                                <div class="menu-subtitle">Préférences et sécurité</div>
+                            </div>
+                            <div class="menu-arrow">›</div>
+                        </div>
+                        <div class="menu-item" onclick="alert('❓ Aide : Fonctionnalité à venir')">
+                            <div class="menu-icon">❓</div>
+                            <div class="menu-content">
+                                <div class="menu-title">Aide & Support</div>
+                                <div class="menu-subtitle">FAQ et contact</div>
+                            </div>
+                            <div class="menu-arrow">›</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <button class="nav-item active" onclick="showHome()" id="nav-home">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Accueil</div>
+                </button>
+                <button class="nav-item" onclick="showSearch()" id="nav-search">
+                    <div class="nav-icon">🔍</div>
+                    <div class="nav-label">Chercher</div>
+                </button>
+                <button class="nav-item" onclick="openPostModal('service')" id="nav-post">
+                    <div class="nav-icon">➕</div>
+                    <div class="nav-label">Publier</div>
+                </button>
+                <button class="nav-item" onclick="showMessages()" id="nav-messages">
+                    <div class="nav-icon">💬</div>
+                    <div class="nav-label">Messages</div>
+                </button>
+                <button class="nav-item" onclick="showAccountPage()" id="nav-account">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Compte</div>
+                </button>
+            </div>
+
+            <!-- FAB -->
+            <button class="fab" onclick="openPostModal('service')">
+                ➕
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+
+    <!-- Post Modal -->
+    <div class="modal" id="post-modal">
+        <div class="modal-header">
+            <div class="modal-handle"></div>
+            <h2 class="modal-title" id="modal-title">Publier une annonce</h2>
+        </div>
+        <div class="modal-body">
+            <form id="post-form">
+                <input type="hidden" id="post-type">
+                
+                <!-- Type Selector -->
+                <div class="form-group">
+                    <label class="form-label">Type d'annonce <span class="form-required">*</span></label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <button type="button" class="filter-chip active" onclick="setPostType('service')">🔧 Service</button>
+                        <button type="button" class="filter-chip" onclick="setPostType('location')">🪑 Location</button>
+                    </div>
+                </div>
+
+                <!-- Service Form -->
+                <div id="service-form">
+                    <div class="form-group">
+                        <label class="form-label">Nom du prestataire <span class="form-required">*</span></label>
+                        <input type="text" class="form-input" id="service-name" required placeholder="Ex: Jean Électricien">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Catégorie <span class="form-required">*</span></label>
+                        <select class="form-select" id="service-category" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="depannage">⚡ Dépannage & Urgences</option>
+                            <option value="auto">🚗 Auto, Mécanique & Transport</option>
+                            <option value="btp">🧱 BTP & Travaux</option>
+                            <option value="beaute">💄 Beauté & Événements</option>
+                            <option value="maison">🏠 Services à domicile</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Service proposé <span class="form-required">*</span></label>
+                        <input type="text" class="form-input" id="service-type" required placeholder="Ex: Installation électrique">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description <span class="form-required">*</span></label>
+                        <textarea class="form-textarea" id="service-description" required placeholder="Décrivez brièvement votre service..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quartier <span class="form-required">*</span></label>
+                        <select class="form-select" id="service-quartier" required>
+                            <!-- Options loaded dynamically based on selected city -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Téléphone / WhatsApp <span class="form-required">*</span></label>
+                        <input type="tel" class="form-input" id="service-phone" required placeholder="+243 XXX XXX XXX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Prix indicatif</label>
+                        <input type="text" class="form-input" id="service-price" placeholder="Ex: À partir de 50$">
+                    </div>
+                </div>
+
+                <!-- Location Form -->
+                <div id="location-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Nom du matériel <span class="form-required">*</span></label>
+                        <input type="text" class="form-input" id="location-name" required placeholder="Ex: Groupe électrogène 5kVA">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Catégorie <span class="form-required">*</span></label>
+                        <select class="form-select" id="location-category" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="energie">🔌 Énergie (Groupes, Panneaux solaires)</option>
+                            <option value="evenement">🎪 Événementiel (Chaises, Tentes, Tables)</option>
+                            <option value="vehicules">🚗 Véhicules (Voitures, Motos, Camions)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description <span class="form-required">*</span></label>
+                        <textarea class="form-textarea" id="location-description" required placeholder="État, usage, conditions..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Prix par jour <span class="form-required">*</span></label>
+                        <input type="text" class="form-input" id="location-price" required placeholder="Ex: 100$ / jour">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quartier <span class="form-required">*</span></label>
+                        <select class="form-select" id="location-quartier" required>
+                            <!-- Options loaded dynamically based on selected city -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Téléphone / WhatsApp <span class="form-required">*</span></label>
+                        <input type="tel" class="form-input" id="location-phone" required placeholder="+243 XXX XXX XXX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Caution demandée ?</label>
+                        <select class="form-select" id="location-caution">
+                            <option value="non">Non</option>
+                            <option value="oui">Oui</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Livraison possible ?</label>
+                        <select class="form-select" id="location-livraison">
+                            <option value="non">Non</option>
+                            <option value="oui">Oui</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit">Publier l'annonce</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div class="notifications-panel" id="notifications-panel">
+        <div class="notifications-header">
+            <div class="notifications-title">
+                🔔 Notifications
+                <span class="notification-count" id="notification-count">0</span>
+            </div>
+            <button class="btn-close-notifications" onclick="closeNotifications()">✕</button>
+        </div>
+        <div class="notifications-body" id="notifications-body">
+            <!-- Notifications loaded here -->
+        </div>
+        <div class="notifications-footer">
+            <button class="btn-mark-all-read" onclick="markAllAsRead()">Tout marquer comme lu</button>
+        </div>
+    </div>
+
+    <!-- Reviews Detail Modal -->
+    <div class="reviews-modal" id="reviews-modal">
+        <div class="reviews-modal-header">
+            <button class="btn-back-reviews" onclick="closeReviewsModal()">←</button>
+            <div class="reviews-modal-title" id="reviews-modal-title">Tous les avis</div>
+        </div>
+        <div class="reviews-modal-body" id="reviews-modal-body">
+            <!-- Reviews content loaded here -->
+        </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div class="rating-modal" id="rating-modal">
+        <div class="rating-modal-header">
+            <div class="modal-handle"></div>
+            <h2 class="rating-modal-title" id="rating-modal-title">Comment s'est passé le service ?</h2>
+            <p class="rating-modal-subtitle" id="rating-modal-subtitle">Notez votre expérience avec ce prestataire</p>
+        </div>
+        <div class="rating-modal-body" id="rating-modal-content">
+            <form id="rating-form">
+                <input type="hidden" id="rating-listing-id">
+                
+                <div class="rating-criteria">
+                    <!-- Criterion 1 -->
+                    <div class="rating-criterion">
+                        <label class="criterion-label" id="criterion-1-label">Qualité du travail</label>
+                        <div class="star-rating" data-criterion="1">
+                            <span class="star" data-value="1">☆</span>
+                            <span class="star" data-value="2">☆</span>
+                            <span class="star" data-value="3">☆</span>
+                            <span class="star" data-value="4">☆</span>
+                            <span class="star" data-value="5">☆</span>
+                        </div>
+                    </div>
+
+                    <!-- Criterion 2 -->
+                    <div class="rating-criterion">
+                        <label class="criterion-label" id="criterion-2-label">Professionnalisme</label>
+                        <div class="star-rating" data-criterion="2">
+                            <span class="star" data-value="1">☆</span>
+                            <span class="star" data-value="2">☆</span>
+                            <span class="star" data-value="3">☆</span>
+                            <span class="star" data-value="4">☆</span>
+                            <span class="star" data-value="5">☆</span>
+                        </div>
+                    </div>
+
+                    <!-- Criterion 3 -->
+                    <div class="rating-criterion">
+                        <label class="criterion-label" id="criterion-3-label">Ponctualité</label>
+                        <div class="star-rating" data-criterion="3">
+                            <span class="star" data-value="1">☆</span>
+                            <span class="star" data-value="2">☆</span>
+                            <span class="star" data-value="3">☆</span>
+                            <span class="star" data-value="4">☆</span>
+                            <span class="star" data-value="5">☆</span>
+                        </div>
+                    </div>
+
+                    <!-- Criterion 4 -->
+                    <div class="rating-criterion">
+                        <label class="criterion-label">Rapport qualité/prix</label>
+                        <div class="star-rating" data-criterion="4">
+                            <span class="star" data-value="1">☆</span>
+                            <span class="star" data-value="2">☆</span>
+                            <span class="star" data-value="3">☆</span>
+                            <span class="star" data-value="4">☆</span>
+                            <span class="star" data-value="5">☆</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rating-comment">
+                    <label class="comment-label">Votre commentaire (optionnel)</label>
+                    <textarea 
+                        class="comment-textarea" 
+                        id="rating-comment" 
+                        maxlength="200" 
+                        placeholder="Partagez votre expérience..."
+                        oninput="updateCommentCounter()"></textarea>
+                    <div class="comment-counter">
+                        <span id="comment-count">0</span>/200 caractères
+                    </div>
+                </div>
+
+                <div class="quick-tags">
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Très professionnel</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Travail soigné</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Rapide</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ À l'heure</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Bon prix</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Je recommande</button>
+                </div>
+
+                <button type="submit" class="btn-submit-rating" id="submit-rating-btn">Publier mon avis ⭐</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SUPABASE CONFIG
+        // ============================================
+        const SUPABASE_URL = 'https://vcpbhybbfijtgdyjyyzr.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjcGJoeWJiZmlqdGdkeWp5eXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzMTUxNDYsImV4cCI6MjA5OTg5MTE0Nn0.5zsUC_CsPo3UQiz1efoJoDhxjyaJdnmfqWwKl8MiN14';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // App State
+        let currentUser = null;
+        let currentTab = 'services';
+        let currentCategory = null;
+        let currentQuartier = '';
+        let currentCity = 'Kolwezi';
+        let listings = [];
+        let selectedAccountType = null;
+        let currentRatingListingId = null;
+        let currentRatings = {
+            criterion1: 0,
+            criterion2: 0,
+            criterion3: 0,
+            criterion4: 0
+        };
+        let notifications = [];
+
+        // Cities Configuration
+        const cities = {
+            'Kolwezi': {
+                name: 'Kolwezi',
+                active: true,
+                quartiers: ['Manika', 'Dilala', 'Musonoi', 'Gécamines', 'Mujingita', 'Kasulo', 'Lupemba', 'Mutshatsha']
+            },
+            'Lubumbashi': {
+                name: 'Lubumbashi',
+                active: false,
+                quartiers: ['Lubumbashi', 'Kenya', 'Katuba', 'Kampemba', 'Ruashi', 'Annexe', 'Kamalondo', 'Golf']
+            },
+            'Kinshasa': {
+                name: 'Kinshasa',
+                active: false,
+                quartiers: ['Gombe', 'Limete', 'Kalamu', 'Kintambo', 'Bandalungwa', 'Ngaliema', 'Lemba', 'Matete', 'Masina', 'Ndjili']
+            },
+            'Mbuji-Mayi': {
+                name: 'Mbuji-Mayi',
+                active: false,
+                quartiers: ['Dibindi', 'Dikolongo', 'Bipemba', 'Bonzola', 'Muya', 'Tshimbalanga']
+            },
+            'Kananga': {
+                name: 'Kananga',
+                active: false,
+                quartiers: ['Ndesha', 'Katoka', 'Nganza', 'Lukonga', 'Kananga']
+            },
+            'Goma': {
+                name: 'Goma',
+                active: false,
+                quartiers: ['Himbi', 'Karisimbi', 'Les Volcans', 'Murara', 'Bujovu', 'Majengo']
+            },
+            'Kisangani': {
+                name: 'Kisangani',
+                active: false,
+                quartiers: ['Makiso', 'Kabondo', 'Tshopo', 'Mangobo', 'Lubunga']
+            },
+            'Bukavu': {
+                name: 'Bukavu',
+                active: false,
+                quartiers: ['Ibanda', 'Kadutu', 'Bagira', 'Nguba', 'Panzi']
+            },
+            'Likasi': {
+                name: 'Likasi',
+                active: false,
+                quartiers: ['Kikula', 'Panda', 'Shituru', 'Likasi', 'Kinsenda']
+            },
+            'Matadi': {
+                name: 'Matadi',
+                active: false,
+                quartiers: ['Matadi', 'Nzanza', 'Mvuzi', 'Camp Permanent']
+            }
+        };
+
+        // Categories
+        const categories = {
+            services: [
+                { id: 'depannage', icon: '⚡', title: 'Dépannage\n& Urgences' },
+                { id: 'auto', icon: '🚗', title: 'Auto, Mécanique\n& Transport' },
+                { id: 'btp', icon: '🧱', title: 'BTP\n& Travaux' },
+                { id: 'beaute', icon: '💄', title: 'Beauté\n& Événements' },
+                { id: 'maison', icon: '🏠', title: 'Services\nà domicile' }
+            ],
+            location: [
+                { id: 'energie', icon: '🔌', title: 'Énergie' },
+                { id: 'evenement', icon: '🎪', title: 'Événementiel' },
+                { id: 'vehicules', icon: '🚗', title: 'Véhicules' }
+            ]
+        };
+
+        // Note : les annonces d'exemple ne sont plus codées en dur ici.
+        // Elles sont désormais dans Supabase (voir supabase-seed-data.sql)
+        // et chargées au démarrage par loadListingsFromDB().
+
+        // Initialize
+        async function init() {
+            await loadListingsFromDB();
+            checkAuth();
+            renderCityDropdown();
+            updateQuartierFilters();
+        }
+
+        async function loadListingsFromDB() {
+            const { data, error } = await supabaseClient
+                .from('listings')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erreur chargement annonces:', error);
+                listings = [];
+                return;
+            }
+
+            // Adapter les noms de champs snake_case (DB) vers ceux attendus par le reste du code
+            listings = data.map(l => ({
+                ...l,
+                userId: l.user_id,
+                createdAt: l.created_at
+            }));
+        }
+
+        // City Management Functions
+        function renderCityDropdown() {
+            const dropdown = document.getElementById('city-dropdown');
+            
+            dropdown.innerHTML = Object.keys(cities).map(cityKey => {
+                const city = cities[cityKey];
+                const isActive = city.active;
+                const isCurrent = cityKey === currentCity;
+                
+                return `
+                    <div class="city-dropdown-item ${isCurrent ? 'active' : ''}" onclick="selectCity('${cityKey}')">
+                        <div class="city-info">
+                            <div class="city-name">${city.name}</div>
+                            <div class="city-status ${isActive ? 'active' : ''}">${isActive ? 'Actif' : 'Bientôt disponible'}</div>
+                        </div>
+                        <span class="city-badge ${isActive ? 'active' : 'soon'}">${isActive ? 'ACTIF' : 'BIENTÔT'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleCityDropdown() {
+            const dropdown = document.getElementById('city-dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function selectCity(cityKey) {
+            const city = cities[cityKey];
+            
+            if (!city.active) {
+                alert(`🔔 ${city.name} sera bientôt disponible !\n\nBamsGo arrive prochainement dans votre ville.\n\nEn attendant, découvrez nos services à Kolwezi ! 🚀`);
+                return;
+            }
+            
+            currentCity = cityKey;
+            currentQuartier = '';
+            document.getElementById('current-city').textContent = city.name;
+            toggleCityDropdown();
+            updateQuartierFilters();
+            
+            // If on listings view, refresh listings
+            if (currentCategory) {
+                renderListings();
+            }
+        }
+
+        function updateQuartierFilters() {
+            const filterBar = document.getElementById('filter-bar');
+            const quartiers = cities[currentCity].quartiers;
+            
+            filterBar.innerHTML = `
+                <button class="filter-chip active" onclick="filterQuartier('')">Tous</button>
+                ${quartiers.map(q => `<button class="filter-chip" onclick="filterQuartier('${q}')">${q}</button>`).join('')}
+            `;
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const citySelector = document.querySelector('.city-selector');
+            const dropdown = document.getElementById('city-dropdown');
+            
+            if (citySelector && !citySelector.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Check Authentication
+        async function checkAuth() {
+            const savedPhone = localStorage.getItem('bamsgo_user_phone');
+            if (savedPhone) {
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('phone', savedPhone)
+                    .single();
+
+                if (data && !error) {
+                    currentUser = data;
+                    showMainApp();
+                    return;
+                }
+            }
+            showAuthPage();
+        }
+
+        // Show Auth Page
+        function showAuthPage() {
+            document.getElementById('auth-page').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        }
+
+        // Show Main App
+        async function showMainApp() {
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            updateAccountInfo();
+            renderCategories();
+            
+            // Load notifications
+            await loadNotifications();
+            updateNotificationBadge();
+        }
+
+        // Select Account Type
+        function selectAccountType(type) {
+            selectedAccountType = type;
+            document.querySelectorAll('.account-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+            
+            if (type === 'prestataire') {
+                document.getElementById('prestataire-fields').style.display = 'block';
+                document.getElementById('auth-specialty').required = true;
+            } else {
+                document.getElementById('prestataire-fields').style.display = 'none';
+                document.getElementById('auth-specialty').required = false;
+            }
+        }
+
+        // Auth Form Submit
+        document.getElementById('auth-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedAccountType) {
+                alert('Veuillez choisir un type de compte');
+                return;
+            }
+
+            const name = document.getElementById('auth-name').value;
+            const phone = document.getElementById('auth-phone').value;
+            const specialty = document.getElementById('auth-specialty').value;
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            // Vérifier si l'utilisateur existe déjà (reconnexion par téléphone)
+            const { data: existingUser } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('phone', phone)
+                .single();
+
+            if (existingUser) {
+                currentUser = existingUser;
+            } else {
+                const { data: newUser, error } = await supabaseClient
+                    .from('users')
+                    .insert({
+                        name,
+                        phone,
+                        type: selectedAccountType,
+                        specialty: selectedAccountType === 'prestataire' ? specialty : null
+                    })
+                    .select()
+                    .single();
+
+                if (error) {
+                    alert('❌ Erreur lors de la création du compte : ' + error.message);
+                    if (submitBtn) submitBtn.disabled = false;
+                    return;
+                }
+                currentUser = newUser;
+            }
+
+            localStorage.setItem('bamsgo_user_phone', currentUser.phone);
+            if (submitBtn) submitBtn.disabled = false;
+            showMainApp();
+        });
+
+        // Update Account Info
+        function updateAccountInfo() {
+            if (!currentUser) return;
+
+            const initial = currentUser.name.charAt(0).toUpperCase();
+            const typeName = currentUser.type === 'client' ? 'Client' : 'Prestataire';
+
+            document.getElementById('account-avatar').textContent = initial;
+            document.getElementById('account-name').textContent = currentUser.name;
+            
+            const badge = document.getElementById('account-type-badge');
+            badge.textContent = typeName;
+            badge.className = 'user-type-badge ' + currentUser.type;
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                localStorage.removeItem('bamsgo_user_phone');
+                currentUser = null;
+                showAuthPage();
+            }
+        }
+
+        // Navigation Functions
+        function showHome() {
+            setActiveNav('nav-home');
+            document.getElementById('categories-view').style.display = 'block';
+            document.getElementById('listings-view').style.display = 'none';
+            document.getElementById('account-page').style.display = 'none';
+            const messagesView = document.getElementById('messages-view');
+            if (messagesView) messagesView.style.display = 'none';
+            currentCategory = null;
+            renderCategories();
+        }
+
+        function showSearch() {
+            setActiveNav('nav-search');
+            alert('🔍 Recherche\n\nFonctionnalité à venir :\n• Recherche par mot-clé\n• Filtres avancés\n• Recherche vocale');
+        }
+
+        async function showMessages() {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour voir vos messages');
+                return;
+            }
+            
+            setActiveNav('nav-messages');
+            document.getElementById('categories-view').style.display = 'none';
+            document.getElementById('listings-view').style.display = 'none';
+            document.getElementById('account-page').style.display = 'none';
+            
+            // Create messages view
+            const mainApp = document.getElementById('main-app');
+            let messagesView = document.getElementById('messages-view');
+            
+            if (!messagesView) {
+                messagesView = document.createElement('div');
+                messagesView.id = 'messages-view';
+                messagesView.style.padding = '1.25rem';
+                mainApp.appendChild(messagesView);
+            }
+            
+            messagesView.style.display = 'block';
+            messagesView.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Chargement...</div>';
+
+            // Get contacts history from Supabase
+            const { data: contacts, error } = await supabaseClient
+                .from('contacts')
+                .select('*')
+                .eq('user_id', currentUser.phone)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erreur chargement contacts:', error);
+                messagesView.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Erreur de chargement</div>';
+                return;
+            }
+            
+            if (!contacts || contacts.length === 0) {
+                messagesView.innerHTML = `
+                    <div style="text-align: center; padding: 3rem 1rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;">💬</div>
+                        <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem;">Aucun contact pour le moment</h3>
+                        <p style="color: var(--text-medium); font-size: 0.9375rem;">Commencez à contacter des prestataires pour voir votre historique ici</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group by listing (most recent contact per listing)
+            const uniqueContacts = [];
+            const seenListings = new Set();
+            
+            contacts.forEach(contact => {
+                if (!seenListings.has(contact.listing_id)) {
+                    seenListings.add(contact.listing_id);
+                    uniqueContacts.push(contact);
+                }
+            });
+
+            // Check which listings this user has already rated
+            const listingIds = uniqueContacts.map(c => c.listing_id);
+            const { data: myRatings } = await supabaseClient
+                .from('ratings')
+                .select('listing_id')
+                .eq('user_id', currentUser.phone)
+                .in('listing_id', listingIds);
+            const ratedListingIds = new Set((myRatings || []).map(r => r.listing_id));
+            
+            messagesView.innerHTML = `
+                <div class="section-header" style="margin-bottom: 1rem;">
+                    <h2 class="section-title">💬 Historique des contacts</h2>
+                    <p style="color: var(--text-medium); font-size: 0.875rem; margin-top: 0.5rem;">
+                        ${uniqueContacts.length} conversation${uniqueContacts.length > 1 ? 's' : ''}
+                    </p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    ${uniqueContacts.map(contact => {
+                        const listing = listings.find(l => l.id === contact.listing_id);
+                        if (!listing) return '';
+                        
+                        const userHasRated = ratedListingIds.has(contact.listing_id);
+                        
+                        return `
+                            <div style="background: white; border: 2px solid var(--border); border-radius: 16px; padding: 1rem;">
+                                <div style="display: flex; gap: 1rem; align-items: start;">
+                                    <div style="font-size: 2.5rem; flex-shrink: 0;">${listing.icon}</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 700; font-size: 0.9375rem; margin-bottom: 0.25rem;">${listing.name}</div>
+                                        <div style="font-size: 0.875rem; color: var(--text-medium); margin-bottom: 0.75rem;">
+                                            📍 ${listing.quartier} • ${listing.type === 'service' ? 'Service' : 'Location'}
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                            <span style="font-size: 0.75rem; color: var(--text-light);">Contacté ${getTimeAgo(contact.created_at)}</span>
+                                        </div>
+                                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                            <button onclick="window.open('https://wa.me/${listing.phone.replace(/\s/g, '')}', '_blank')"
+                                                    style="padding: 0.5rem 1rem; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-family: 'Outfit', sans-serif;">
+                                                💬 Recontacter
+                                            </button>
+                                            ${!userHasRated ? `
+                                                <button onclick="closeMessagesAndRate(${listing.id})"
+                                                        style="padding: 0.5rem 1rem; background: var(--accent); color: var(--text-dark); border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-family: 'Outfit', sans-serif;">
+                                                    ⭐ Noter ce service
+                                                </button>
+                                            ` : `
+                                                <div style="padding: 0.5rem 1rem; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 8px; font-weight: 600; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                                                    ✅ Déjà noté
+                                                </div>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div style="margin-top: 2rem; padding: 1rem; background: rgba(232, 93, 4, 0.05); border-radius: 12px; border-left: 4px solid var(--primary);">
+                    <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem;">💡 Astuce</div>
+                    <p style="font-size: 0.8125rem; color: var(--text-medium); line-height: 1.5;">
+                        Après avoir utilisé un service, n'oubliez pas de le noter ! Vos avis aident la communauté BamsGo.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Helper function to close messages and open rating
+        function closeMessagesAndRate(listingId) {
+            const messagesView = document.getElementById('messages-view');
+            if (messagesView) messagesView.style.display = 'none';
+            openRatingModal(listingId);
+        }
+
+        function showAccountPage() {
+            setActiveNav('nav-account');
+            document.getElementById('categories-view').style.display = 'none';
+            document.getElementById('listings-view').style.display = 'none';
+            const messagesView = document.getElementById('messages-view');
+            if (messagesView) messagesView.style.display = 'none';
+            document.getElementById('account-page').style.display = 'block';
+        }
+
+        function showNotifications() {
+            alert('🔔 Notifications\n\nVous avez 3 nouvelles notifications :\n• Nouvelle annonce disponible\n• Message reçu\n• Favoris mis à jour');
+        }
+
+        function setActiveNav(activeId) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.getElementById(activeId).classList.add('active');
+        }
+
+        // Categories & Listings
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-services').classList.toggle('active', tab === 'services');
+            document.getElementById('tab-location').classList.toggle('active', tab === 'location');
+            showCategories();
+        }
+
+        function showCategories() {
+            currentCategory = null;
+            document.getElementById('categories-view').style.display = 'block';
+            document.getElementById('listings-view').style.display = 'none';
+            document.getElementById('account-page').style.display = 'none';
+            setActiveNav('nav-home');
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories-scroll');
+            const cats = categories[currentTab];
+            
+            container.innerHTML = cats.map(cat => `
+                <div class="category-chip" onclick="showListings('${cat.id}')">
+                    <div class="category-chip-icon">${cat.icon}</div>
+                    <div class="category-chip-label">${cat.title}</div>
+                </div>
+            `).join('');
+        }
+
+        function showListings(categoryId) {
+            currentCategory = categoryId;
+            currentQuartier = '';
+            document.getElementById('categories-view').style.display = 'none';
+            document.getElementById('listings-view').style.display = 'block';
+            document.getElementById('account-page').style.display = 'none';
+            
+            const category = categories[currentTab].find(c => c.id === categoryId);
+            document.getElementById('listings-title').textContent = category.title.replace('\n', ' ');
+            
+            document.querySelectorAll('#filter-bar .filter-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.textContent === 'Tous');
+            });
+            
+            renderListings();
+        }
+
+        function filterQuartier(quartier) {
+            currentQuartier = quartier;
+            document.querySelectorAll('#filter-bar .filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderListings();
+        }
+
+        async function renderListings() {
+            const grid = document.getElementById('listings-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            await loadRatingsCache();
+            
+            let filtered = listings.filter(l => 
+                l.type === currentTab && 
+                l.category === currentCategory &&
+                l.city === currentCity &&
+                (!currentQuartier || l.quartier === currentQuartier)
+            );
+            
+            if (filtered.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+            } else {
+                grid.style.display = 'grid';
+                emptyState.style.display = 'none';
+                
+                grid.innerHTML = filtered.map(listing => `
+                    <div class="listing-card">
+                        <div class="listing-image">
+                            <div class="listing-badge">${listing.type === 'service' ? 'SERVICE' : 'LOCATION'}</div>
+                            ${listing.icon}
+                        </div>
+                        <div class="listing-content">
+                            <h3 class="listing-title">${listing.name}</h3>
+                            <div class="listing-meta">
+                                <div class="listing-location">
+                                    <span>📍</span>
+                                    <span>${listing.quartier}</span>
+                                </div>
+                                ${listing.service ? `
+                                    <div class="listing-separator"></div>
+                                    <div class="listing-type">${listing.service}</div>
+                                ` : ''}
+                            </div>
+                            ${getRatingHTML(listing.id)}
+                            <p class="listing-description">${listing.description}</p>
+                            <div class="listing-footer">
+                                <div class="listing-price">${listing.price}</div>
+                                <button class="btn-contact" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
+                                    <span>💬</span>
+                                    <span>Contacter</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Modal Functions
+        function openPostModal(type) {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour publier une annonce');
+                return;
+            }
+
+            if (currentUser.type === 'client' && type === 'service') {
+                alert('Seuls les prestataires peuvent publier des services.\n\nVous pouvez publier des locations d\'équipement.');
+                return;
+            }
+
+            document.getElementById('modal-overlay').classList.add('active');
+            document.getElementById('post-modal').classList.add('active');
+            setPostType(type);
+            document.getElementById('post-form').reset();
+            
+            // Populate quartiers for current city
+            populateFormQuartiers();
+            
+            // Pre-fill phone for prestataire
+            if (currentUser.type === 'prestataire') {
+                document.getElementById('service-phone').value = currentUser.phone;
+                document.getElementById('location-phone').value = currentUser.phone;
+            }
+        }
+
+        function populateFormQuartiers() {
+            const quartiers = cities[currentCity].quartiers;
+            const serviceSelect = document.getElementById('service-quartier');
+            const locationSelect = document.getElementById('location-quartier');
+            
+            const options = '<option value="">Sélectionnez un quartier</option>' + 
+                quartiers.map(q => `<option value="${q}">${q}</option>`).join('');
+            
+            serviceSelect.innerHTML = options;
+            locationSelect.innerHTML = options;
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.getElementById('post-modal').classList.remove('active');
+        }
+
+        function setPostType(type) {
+            document.getElementById('post-type').value = type;
+            document.getElementById('modal-title').textContent = 
+                type === 'service' ? 'Proposer un Service' : 'Proposer une Location';
+            
+            document.getElementById('service-form').style.display = type === 'service' ? 'block' : 'none';
+            document.getElementById('location-form').style.display = type === 'location' ? 'block' : 'none';
+        }
+
+        // Form Submit with validation and error handling, saved to Supabase
+        document.addEventListener('DOMContentLoaded', function() {
+            const postForm = document.getElementById('post-form');
+            if (!postForm) {
+                console.error('Post form not found!');
+                return;
+            }
+            
+            postForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const submitBtn = postForm.querySelector('button[type="submit"]');
+                
+                try {
+                    const type = document.getElementById('post-type').value;
+                    
+                    // Validation
+                    let errors = [];
+                    let newListing = null;
+                    
+                    if (type === 'service') {
+                        const category = document.getElementById('service-category').value;
+                        const name = document.getElementById('service-name').value;
+                        const serviceType = document.getElementById('service-type').value;
+                        const description = document.getElementById('service-description').value;
+                        const quartier = document.getElementById('service-quartier').value;
+                        const phone = document.getElementById('service-phone').value;
+                        
+                        if (!category) errors.push('❌ Veuillez sélectionner une catégorie');
+                        if (!name || name.trim().length < 3) errors.push('❌ Le nom doit contenir au moins 3 caractères');
+                        if (!serviceType) errors.push('❌ Veuillez préciser le service proposé');
+                        if (!description || description.trim().length < 20) errors.push('❌ La description doit contenir au moins 20 caractères');
+                        if (!quartier) errors.push('❌ Veuillez sélectionner un quartier');
+                        if (!phone || phone.trim().length < 10) errors.push('❌ Numéro de téléphone invalide');
+                        
+                        if (errors.length > 0) {
+                            alert('⚠️ ERREURS DE VALIDATION :\n\n' + errors.join('\n'));
+                            return;
+                        }
+                        
+                        newListing = {
+                            type: type,
+                            city: currentCity,
+                            category: category,
+                            name: name.trim(),
+                            service: serviceType.trim(),
+                            description: description.trim(),
+                            quartier: quartier,
+                            phone: phone.trim(),
+                            price: document.getElementById('service-price').value.trim() || 'Sur devis',
+                            icon: getIconForCategory(category),
+                            user_id: currentUser.phone
+                        };
+                        
+                    } else {
+                        const category = document.getElementById('location-category').value;
+                        const name = document.getElementById('location-name').value;
+                        const description = document.getElementById('location-description').value;
+                        const price = document.getElementById('location-price').value;
+                        const quartier = document.getElementById('location-quartier').value;
+                        const phone = document.getElementById('location-phone').value;
+                        
+                        if (!category) errors.push('❌ Veuillez sélectionner une catégorie');
+                        if (!name || name.trim().length < 3) errors.push('❌ Le nom doit contenir au moins 3 caractères');
+                        if (!description || description.trim().length < 20) errors.push('❌ La description doit contenir au moins 20 caractères');
+                        if (!price) errors.push('❌ Veuillez indiquer le prix');
+                        if (!quartier) errors.push('❌ Veuillez sélectionner un quartier');
+                        if (!phone || phone.trim().length < 10) errors.push('❌ Numéro de téléphone invalide');
+                        
+                        if (errors.length > 0) {
+                            alert('⚠️ ERREURS DE VALIDATION :\n\n' + errors.join('\n'));
+                            return;
+                        }
+                        
+                        newListing = {
+                            type: type,
+                            city: currentCity,
+                            category: category,
+                            name: name.trim(),
+                            description: description.trim(),
+                            price: price.trim(),
+                            quartier: quartier,
+                            phone: phone.trim(),
+                            icon: getIconForCategory(category),
+                            user_id: currentUser.phone
+                        };
+                    }
+
+                    if (submitBtn) submitBtn.disabled = true;
+
+                    const { data: inserted, error } = await supabaseClient
+                        .from('listings')
+                        .insert(newListing)
+                        .select()
+                        .single();
+
+                    if (error) {
+                        alert('❌ ERREUR !\n\nImpossible de publier l\'annonce.\n\nDétails : ' + error.message);
+                        if (submitBtn) submitBtn.disabled = false;
+                        return;
+                    }
+
+                    // Ajouter localement pour affichage immédiat (avec les alias attendus par le reste du code)
+                    listings.unshift({
+                        ...inserted,
+                        userId: inserted.user_id,
+                        createdAt: inserted.created_at
+                    });
+                    
+                    // Add success notification
+                    addNotification({
+                        type: 'listing_published',
+                        icon: '✅',
+                        title: 'Annonce publiée !',
+                        message: `Votre ${type === 'service' ? 'service' : 'location'} est maintenant en ligne`,
+                        date: new Date().toISOString()
+                    });
+                    
+                    if (submitBtn) submitBtn.disabled = false;
+                    closeModal();
+                    alert('✅ SUCCÈS !\n\nVotre annonce a été publiée avec succès !');
+                    
+                    if (currentCategory) {
+                        renderListings();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    alert('❌ ERREUR !\n\nUne erreur est survenue lors de la publication.\n\nDétails : ' + error.message);
+                    if (submitBtn) submitBtn.disabled = false;
+                }
+            });
+        });
+
+        function getIconForCategory(category) {
+            const icons = {
+                'depannage': '⚡', 'auto': '🚗', 'btp': '🧱',
+                'beaute': '💄', 'maison': '🏠',
+                'energie': '🔌', 'evenement': '🎪', 'vehicules': '🚗'
+            };
+            return icons[category] || '📦';
+        }
+
+        // ========== REVIEWS DETAIL MODAL ==========
+
+        // Open reviews detail modal
+        async function openReviewsModal(listingId) {
+            const listing = listings.find(l => l.id === listingId);
+            if (!listing) return;
+
+            document.getElementById('reviews-modal-title').textContent = `Avis - ${listing.name}`;
+            document.getElementById('reviews-modal-body').innerHTML = '<div class="no-reviews"><p class="no-reviews-text">Chargement...</p></div>';
+            document.getElementById('reviews-modal').classList.add('active');
+            document.getElementById('modal-overlay').classList.add('active');
+
+            const { data: reviews, error } = await supabaseClient
+                .from('ratings')
+                .select('*')
+                .eq('listing_id', listingId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erreur chargement avis:', error);
+                return;
+            }
+
+            const count = reviews.length;
+            const average = count > 0
+                ? Math.round((reviews.reduce((sum, r) => sum + r.average, 0) / count) * 10) / 10
+                : 0;
+
+            const ratingData = {
+                count,
+                average,
+                ratings: reviews.map(r => ({
+                    userName: r.user_name,
+                    average: r.average,
+                    comment: r.comment,
+                    tags: r.tags || [],
+                    date: r.created_at,
+                    ratings: {
+                        criterion1: r.criterion1,
+                        criterion2: r.criterion2,
+                        criterion3: r.criterion3,
+                        criterion4: r.criterion4
+                    }
+                }))
+            };
+            
+            renderReviewsDetail(listingId, listing, ratingData);
+        }
+
+        // Close reviews detail modal
+        function closeReviewsModal() {
+            document.getElementById('reviews-modal').classList.remove('active');
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        // Render reviews detail
+        function renderReviewsDetail(listingId, listing, ratingData) {
+            const body = document.getElementById('reviews-modal-body');
+            
+            if (ratingData.count === 0) {
+                body.innerHTML = `
+                    <div class="no-reviews">
+                        <div class="no-reviews-icon">⭐</div>
+                        <p class="no-reviews-text">Aucun avis pour le moment.<br>Soyez le premier à laisser un avis !</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate criteria averages
+            let criteriaAverages = {
+                criterion1: 0,
+                criterion2: 0,
+                criterion3: 0,
+                criterion4: 0
+            };
+            
+            ratingData.ratings.forEach(r => {
+                criteriaAverages.criterion1 += r.ratings.criterion1 || 0;
+                criteriaAverages.criterion2 += r.ratings.criterion2 || 0;
+                criteriaAverages.criterion3 += r.ratings.criterion3 || 0;
+                criteriaAverages.criterion4 += r.ratings.criterion4 || 0;
+            });
+            
+            Object.keys(criteriaAverages).forEach(key => {
+                criteriaAverages[key] = (criteriaAverages[key] / ratingData.count).toFixed(1);
+            });
+
+            // Get criteria labels based on listing type
+            const criteriaLabels = listing.type === 'service' 
+                ? ['Qualité du travail', 'Professionnalisme', 'Ponctualité', 'Rapport qualité/prix']
+                : ['État du matériel', 'Conformité', 'Communication', 'Rapport qualité/prix'];
+
+            const starsDisplay = '★'.repeat(Math.round(ratingData.average));
+            
+            body.innerHTML = `
+                <div class="reviews-summary">
+                    <div class="reviews-overall-rating">${ratingData.average}</div>
+                    <div class="reviews-overall-stars">${starsDisplay}</div>
+                    <div class="reviews-overall-count">Basé sur ${ratingData.count} avis</div>
+                </div>
+
+                <div class="reviews-criteria">
+                    <div class="reviews-criteria-title">📊 Détail des notes</div>
+                    <div class="criteria-item">
+                        <div class="criteria-label">${criteriaLabels[0]}</div>
+                        <div class="criteria-bar-container">
+                            <div class="criteria-bar" style="width: ${(criteriaAverages.criterion1 / 5) * 100}%"></div>
+                        </div>
+                        <div class="criteria-value">${criteriaAverages.criterion1}</div>
+                    </div>
+                    <div class="criteria-item">
+                        <div class="criteria-label">${criteriaLabels[1]}</div>
+                        <div class="criteria-bar-container">
+                            <div class="criteria-bar" style="width: ${(criteriaAverages.criterion2 / 5) * 100}%"></div>
+                        </div>
+                        <div class="criteria-value">${criteriaAverages.criterion2}</div>
+                    </div>
+                    <div class="criteria-item">
+                        <div class="criteria-label">${criteriaLabels[2]}</div>
+                        <div class="criteria-bar-container">
+                            <div class="criteria-bar" style="width: ${(criteriaAverages.criterion3 / 5) * 100}%"></div>
+                        </div>
+                        <div class="criteria-value">${criteriaAverages.criterion3}</div>
+                    </div>
+                    <div class="criteria-item">
+                        <div class="criteria-label">${criteriaLabels[3]}</div>
+                        <div class="criteria-bar-container">
+                            <div class="criteria-bar" style="width: ${(criteriaAverages.criterion4 / 5) * 100}%"></div>
+                        </div>
+                        <div class="criteria-value">${criteriaAverages.criterion4}</div>
+                    </div>
+                </div>
+
+                <div class="reviews-criteria-title">💬 Tous les avis (${ratingData.count})</div>
+                ${ratingData.ratings.map(review => {
+                    const reviewStars = '★'.repeat(Math.round(review.average));
+                    return `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="review-user">${review.userName || 'Utilisateur'}</div>
+                                <div class="review-rating">
+                                    <span class="review-stars">${reviewStars}</span>
+                                    <span class="review-value">${review.average.toFixed(1)}</span>
+                                </div>
+                            </div>
+                            ${review.comment ? `<div class="review-comment">"${review.comment}"</div>` : ''}
+                            ${review.tags && review.tags.length > 0 ? `
+                                <div class="review-tags">
+                                    ${review.tags.map(tag => `<span class="review-tag">${tag}</span>`).join('')}
+                                </div>
+                            ` : ''}
+                            <div class="review-date">${getTimeAgo(review.date)}</div>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        // ========== NOTIFICATIONS SYSTEM ==========
+
+        // Load notifications from localStorage
+        async function loadNotifications() {
+            if (!currentUser) return [];
+
+            const { data, error } = await supabaseClient
+                .from('notifications')
+                .select('*')
+                .eq('user_id', currentUser.phone)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erreur chargement notifications:', error);
+                notifications = [];
+                return notifications;
+            }
+
+            notifications = data.map(n => ({ ...n, date: n.created_at }));
+
+            // Add welcome notification for new users
+            if (notifications.length === 0) {
+                await addNotification({
+                    type: 'welcome',
+                    icon: '🎉',
+                    title: 'Bienvenue sur BamsGo !',
+                    message: currentUser.type === 'prestataire' 
+                        ? 'Publiez vos services et commencez à recevoir des clients'
+                        : 'Trouvez les meilleurs services à ' + currentCity
+                });
+            }
+            
+            return notifications;
+        }
+
+        // Add a notification (par défaut pour l'utilisateur connecté, ou pour un destinataire précis)
+        async function addNotification(notification, recipientPhone) {
+            const targetPhone = recipientPhone || (currentUser ? currentUser.phone : null);
+            if (!targetPhone) return;
+
+            const { data, error } = await supabaseClient
+                .from('notifications')
+                .insert({
+                    user_id: targetPhone,
+                    type: notification.type,
+                    icon: notification.icon,
+                    title: notification.title,
+                    message: notification.message
+                })
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Erreur ajout notification:', error);
+                return;
+            }
+
+            // Si c'est pour l'utilisateur actuellement connecté, mettre à jour l'affichage local
+            if (currentUser && targetPhone === currentUser.phone) {
+                notifications.unshift({ ...data, date: data.created_at });
+                updateNotificationBadge();
+            }
+        }
+
+        // Show notifications panel
+        async function showNotifications() {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour voir vos notifications');
+                return;
+            }
+            
+            await loadNotifications();
+            renderNotifications();
+            document.getElementById('notifications-panel').classList.add('active');
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        // Close notifications panel
+        function closeNotifications() {
+            document.getElementById('notifications-panel').classList.remove('active');
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        // Render notifications
+        function renderNotifications() {
+            const body = document.getElementById('notifications-body');
+            const count = document.getElementById('notification-count');
+            
+            const unreadCount = notifications.filter(n => !n.read).length;
+            count.textContent = unreadCount;
+            
+            if (notifications.length === 0) {
+                body.innerHTML = `
+                    <div class="empty-notifications">
+                        <div class="empty-notifications-icon">🔔</div>
+                        <p class="empty-notifications-text">Aucune notification pour le moment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            body.innerHTML = notifications.map(notif => `
+                <div class="notification-item ${notif.read ? '' : 'unread'}" onclick="markAsRead('${notif.id}')">
+                    <div class="notification-icon">${notif.icon}</div>
+                    <div class="notification-content">
+                        <div class="notification-title">${notif.title}</div>
+                        <div class="notification-message">${notif.message}</div>
+                        <div class="notification-time">${getTimeAgo(notif.date)}</div>
+                    </div>
+                    ${!notif.read ? '<div class="notification-dot"></div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        // Mark notification as read
+        async function markAsRead(notifId) {
+            const notif = notifications.find(n => n.id == notifId);
+            if (notif) {
+                notif.read = true;
+                renderNotifications();
+                updateNotificationBadge();
+                await supabaseClient.from('notifications').update({ read: true }).eq('id', notifId);
+            }
+        }
+
+        // Mark all as read
+        async function markAllAsRead() {
+            const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+            notifications.forEach(n => n.read = true);
+            renderNotifications();
+            updateNotificationBadge();
+            if (unreadIds.length > 0) {
+                await supabaseClient.from('notifications').update({ read: true }).in('id', unreadIds);
+            }
+        }
+
+        // Update notification badge
+        function updateNotificationBadge() {
+            const badge = document.querySelector('.icon-btn .badge');
+            const unreadCount = notifications.filter(n => !n.read).length;
+            
+            if (badge) {
+                badge.textContent = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+        }
+
+        // Get time ago text
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'À l\'instant';
+            if (seconds < 3600) return `Il y a ${Math.floor(seconds / 60)} min`;
+            if (seconds < 86400) return `Il y a ${Math.floor(seconds / 3600)}h`;
+            if (seconds < 604800) return `Il y a ${Math.floor(seconds / 86400)} jour${Math.floor(seconds / 86400) > 1 ? 's' : ''}`;
+            return `Il y a ${Math.floor(seconds / 604800)} semaine${Math.floor(seconds / 604800) > 1 ? 's' : ''}`;
+        }
+
+        // Trigger notification when contact is made
+        async function notifyContact(listingId) {
+            const listing = listings.find(l => l.id === listingId);
+            if (!listing || !currentUser) return;
+            
+            // Notifier le propriétaire de l'annonce (sauf s'il se contacte lui-même)
+            const ownerPhone = listing.userId || listing.user_id;
+            if (ownerPhone && ownerPhone !== currentUser.phone) {
+                await addNotification({
+                    type: 'contact_received',
+                    icon: '📞',
+                    title: 'Nouveau contact !',
+                    message: `${currentUser.name} s'intéresse à votre annonce "${listing.name}"`
+                }, ownerPhone);
+            }
+        }
+
+        // Trigger notification when rating is received
+        async function notifyNewRating(listingId, rating) {
+            const listing = listings.find(l => l.id === listingId);
+            if (!listing) return;
+            
+            const ownerPhone = listing.userId || listing.user_id;
+            if (ownerPhone && ownerPhone !== rating.userId) {
+                await addNotification({
+                    type: 'rating_received',
+                    icon: '⭐',
+                    title: 'Nouvel avis reçu !',
+                    message: `${rating.userName} a laissé un avis de ${rating.average.toFixed(1)} étoiles sur "${listing.name}"`
+                }, ownerPhone);
+            }
+        }
+
+        // ========== RATING SYSTEM FUNCTIONS ==========
+
+        // Open rating modal
+        function openRatingModal(listingId) {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour noter ce service');
+                return;
+            }
+
+            const listing = listings.find(l => l.id === listingId);
+            if (!listing) return;
+
+            currentRatingListingId = listingId;
+            
+            // Update modal title
+            document.getElementById('rating-modal-title').textContent = `Comment s'est passé le service avec ${listing.name} ?`;
+            
+            // Update criteria labels based on type
+            if (listing.type === 'service') {
+                document.getElementById('criterion-1-label').textContent = 'Qualité du travail';
+                document.getElementById('criterion-2-label').textContent = 'Professionnalisme';
+                document.getElementById('criterion-3-label').textContent = 'Ponctualité';
+            } else {
+                document.getElementById('criterion-1-label').textContent = 'État du matériel';
+                document.getElementById('criterion-2-label').textContent = 'Conformité';
+                document.getElementById('criterion-3-label').textContent = 'Communication';
+            }
+
+            // Reset form
+            currentRatings = { criterion1: 0, criterion2: 0, criterion3: 0, criterion4: 0 };
+            document.getElementById('rating-form').reset();
+            resetStars();
+            
+            // Show modal
+            document.getElementById('modal-overlay').classList.add('active');
+            document.getElementById('rating-modal').classList.add('active');
+        }
+
+        // Close rating modal
+        function closeRatingModal() {
+            document.getElementById('rating-modal').classList.remove('active');
+            document.getElementById('modal-overlay').classList.remove('active');
+            currentRatingListingId = null;
+        }
+
+        // Reset all stars
+        function resetStars() {
+            document.querySelectorAll('.star').forEach(star => {
+                star.textContent = '☆';
+                star.classList.remove('active');
+            });
+        }
+
+        // Handle star rating click
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.star-rating').forEach(ratingContainer => {
+                const criterionNum = ratingContainer.dataset.criterion;
+                const stars = ratingContainer.querySelectorAll('.star');
+                
+                stars.forEach((star, index) => {
+                    // Click event
+                    star.addEventListener('click', function() {
+                        const value = parseInt(this.dataset.value);
+                        currentRatings[`criterion${criterionNum}`] = value;
+                        
+                        // Update stars display
+                        stars.forEach((s, i) => {
+                            if (i < value) {
+                                s.textContent = '★';
+                                s.classList.add('active');
+                            } else {
+                                s.textContent = '☆';
+                                s.classList.remove('active');
+                            }
+                        });
+                    });
+                    
+                    // Hover effect
+                    star.addEventListener('mouseenter', function() {
+                        const value = parseInt(this.dataset.value);
+                        stars.forEach((s, i) => {
+                            if (i < value) {
+                                s.textContent = '★';
+                            } else {
+                                s.textContent = '☆';
+                            }
+                        });
+                    });
+                });
+                
+                // Mouse leave - restore selected rating
+                ratingContainer.addEventListener('mouseleave', function() {
+                    const selectedValue = currentRatings[`criterion${criterionNum}`];
+                    stars.forEach((s, i) => {
+                        if (i < selectedValue) {
+                            s.textContent = '★';
+                        } else {
+                            s.textContent = '☆';
+                        }
+                    });
+                });
+            });
+        });
+
+        // Toggle quick tag
+        function toggleTag(tagBtn) {
+            tagBtn.classList.toggle('selected');
+        }
+
+        // Update comment counter
+        function updateCommentCounter() {
+            const textarea = document.getElementById('rating-comment');
+            const counter = document.getElementById('comment-count');
+            counter.textContent = textarea.value.length;
+        }
+
+        // Submit rating
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('rating-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Check if at least one criterion is rated
+                const hasRating = Object.values(currentRatings).some(v => v > 0);
+                if (!hasRating) {
+                    alert('Veuillez noter au moins un critère');
+                    return;
+                }
+
+                // Get comment and selected tags
+                const comment = document.getElementById('rating-comment').value.trim();
+                const selectedTags = Array.from(document.querySelectorAll('.quick-tag.selected'))
+                    .map(tag => tag.textContent);
+
+                // Calculate average
+                const ratingsArray = Object.values(currentRatings).filter(v => v > 0);
+                const average = ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length;
+
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                if (submitBtn) submitBtn.disabled = true;
+
+                // Upsert : insère, ou met à jour si cette personne a déjà noté cette annonce
+                // (grâce à la contrainte unique (listing_id, user_id) définie dans le schéma)
+                const { error } = await supabaseClient
+                    .from('ratings')
+                    .upsert({
+                        listing_id: currentRatingListingId,
+                        user_id: currentUser.phone,
+                        user_name: currentUser.name,
+                        criterion1: currentRatings.criterion1,
+                        criterion2: currentRatings.criterion2,
+                        criterion3: currentRatings.criterion3,
+                        criterion4: currentRatings.criterion4,
+                        average: average,
+                        comment: comment,
+                        tags: selectedTags
+                    }, { onConflict: 'listing_id,user_id' });
+
+                if (error) {
+                    alert('❌ Erreur lors de l\'envoi de l\'avis : ' + error.message);
+                    if (submitBtn) submitBtn.disabled = false;
+                    return;
+                }
+
+                const rating = {
+                    userId: currentUser.phone,
+                    userName: currentUser.name,
+                    average: average
+                };
+
+                // Add notification for user
+                await addNotification({
+                    type: 'rating_sent',
+                    icon: '⭐',
+                    title: 'Avis publié !',
+                    message: `Votre avis de ${rating.average.toFixed(1)} étoiles a été enregistré`
+                });
+
+                // Notify listing owner
+                await notifyNewRating(currentRatingListingId, rating);
+
+                if (submitBtn) submitBtn.disabled = false;
+
+                // Show success message
+                showRatingSuccess();
+                
+                // Refresh listings if on listings view
+                if (currentCategory) {
+                    setTimeout(() => {
+                        closeRatingModal();
+                        renderListings();
+                    }, 2000);
+                } else {
+                    setTimeout(() => {
+                        closeRatingModal();
+                    }, 2000);
+                }
+            });
+        });
+
+        // Show rating success
+        function showRatingSuccess() {
+            const modalContent = document.getElementById('rating-modal-content');
+            modalContent.innerHTML = `
+                <div class="rating-success">
+                    <div class="success-icon">✅</div>
+                    <h3 class="success-title">Merci pour votre avis !</h3>
+                    <p class="success-text">Votre notation aide les autres utilisateurs à faire le bon choix.</p>
+                </div>
+            `;
+        }
+
+        // Cache local des moyennes de notes (rempli par renderListings via loadRatingsCache)
+        let ratingsCache = {};
+
+        // Charge les moyennes de toutes les notes en une seule requête groupée
+        async function loadRatingsCache() {
+            const { data, error } = await supabaseClient
+                .from('ratings')
+                .select('listing_id, average');
+
+            if (error) {
+                console.error('Erreur chargement notes:', error);
+                return;
+            }
+
+            ratingsCache = {};
+            data.forEach(r => {
+                if (!ratingsCache[r.listing_id]) {
+                    ratingsCache[r.listing_id] = { sum: 0, count: 0 };
+                }
+                ratingsCache[r.listing_id].sum += r.average;
+                ratingsCache[r.listing_id].count += 1;
+            });
+
+            Object.keys(ratingsCache).forEach(id => {
+                const entry = ratingsCache[id];
+                entry.average = Math.round((entry.sum / entry.count) * 10) / 10;
+            });
+        }
+
+        // Get listing rating (depuis le cache local, rempli par loadRatingsCache)
+        function getListingRating(listingId) {
+            const cached = ratingsCache[listingId];
+            if (!cached) return { average: 0, count: 0 };
+            return { average: cached.average, count: cached.count };
+        }
+
+        // Get rating display HTML
+        function getRatingHTML(listingId) {
+            const rating = getListingRating(listingId);
+            
+            if (rating.count === 0) {
+                return '<span class="rating-display" style="color: var(--text-light); font-weight: 500;">Pas encore d\'avis</span>';
+            }
+
+            const stars = '★'.repeat(Math.round(rating.average));
+            const topBadge = rating.average >= 4.8 && rating.count >= 10 ? '<span class="top-badge">🏆 Top</span>' : '';
+            
+            return `
+                <div class="rating-display" onclick="openReviewsModal(${listingId})" style="cursor: pointer;">
+                    <span class="rating-stars">${stars}</span>
+                    <span class="rating-value">${rating.average}</span>
+                    <span class="rating-count">(${rating.count})</span>
+                    ${topBadge}
+                </div>
+            `;
+        }
+
+        // Update contact button to trigger rating modal
+        function handleContactClick(listingId, phone) {
+            // Open WhatsApp immediately (synchronously) to avoid popup blockers on mobile
+            window.open(`https://wa.me/${phone.replace(/\s/g, '')}`, '_blank');
+
+            // Track contact and notify in the background
+            (async () => {
+                if (currentUser) {
+                    await supabaseClient.from('contacts').insert({
+                        user_id: currentUser.phone,
+                        listing_id: listingId
+                    });
+
+                    const listing = listings.find(l => l.id === listingId);
+                    if (listing) {
+                        await addNotification({
+                            type: 'contact',
+                            icon: '💬',
+                            title: 'Contact enregistré',
+                            message: `Vous avez contacté ${listing.name}. N'oubliez pas de laisser un avis après le service !`
+                        });
+                    }
+
+                    // Notify listing owner
+                    await notifyContact(listingId);
+                }
+            })();
+        }
+
+        // Close modal overlay
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'modal-overlay') {
+                closeModal();
+                closeRatingModal();
+                closeNotifications();
+                closeReviewsModal();
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('✅ Service Worker enregistré'))
+                    .catch(err => console.log('ℹ️ Service Worker non disponible (normal en mode fichier local)'));
+            });
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
