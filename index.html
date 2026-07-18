@@ -1805,6 +1805,31 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de signalement d'annonce -->
+    <div id="report-modal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+        <div class="confirm-modal-box" style="max-width:400px;">
+            <div class="confirm-modal-title" id="report-modal-title">Signaler cette annonce</div>
+            <div class="confirm-modal-message" id="report-modal-subtitle" style="margin-bottom:14px;"></div>
+
+            <label class="form-label" style="margin-bottom:6px;">Raison</label>
+            <select id="report-reason" class="form-select" style="margin-bottom:14px;">
+                <option value="fraude">Fraude ou arnaque</option>
+                <option value="inapproprie">Contenu inapproprié</option>
+                <option value="spam">Spam ou doublon</option>
+                <option value="faux">Informations fausses ou trompeuses</option>
+                <option value="autre">Autre</option>
+            </select>
+
+            <label class="form-label" style="margin-bottom:6px;">Précisions (facultatif)</label>
+            <textarea id="report-comment" class="form-textarea" placeholder="Décrivez brièvement le problème…" maxlength="500" style="margin-bottom:16px;min-height:70px;"></textarea>
+
+            <div class="confirm-modal-actions">
+                <button type="button" class="confirm-btn-cancel" id="report-modal-cancel">Annuler</button>
+                <button type="button" class="confirm-btn-ok danger" id="report-modal-submit">Signaler</button>
+            </div>
+        </div>
+    </div>
     <div class="desktop-brand-panel">
         <div class="brand-mark-lg">
             <div class="logo-circle-lg"><span>B</span></div>
@@ -2465,6 +2490,91 @@
             });
         }
 
+        // ============================================
+        // Signalement d'annonce (modération)
+        // ============================================
+        async function openReportModal(listingId, listingName) {
+            if (!currentUser) {
+                showToast('Connectez-vous pour signaler une annonce.', 'info');
+                return;
+            }
+
+            // On empêche l'auteur de se signaler lui-même
+            const listing = listings.find(l => l.id === listingId);
+            if (listing && listing.user_id === currentUser.phone) {
+                showToast('Vous ne pouvez pas signaler votre propre annonce.', 'warning');
+                return;
+            }
+
+            // Vérifier qu'on n'a pas déjà signalé (la RLS empêche le duplicate côté serveur,
+            // mais autant informer l'utilisateur avant l'ouverture du modal)
+            const { data: existing } = await supabaseClient
+                .from('reports')
+                .select('id')
+                .eq('listing_id', listingId)
+                .eq('reporter_phone', currentUser.phone)
+                .maybeSingle();
+
+            if (existing) {
+                showToast('Vous avez déjà signalé cette annonce. Merci.', 'info');
+                return;
+            }
+
+            const modal = document.getElementById('report-modal');
+            const subtitle = document.getElementById('report-modal-subtitle');
+            const reasonSel = document.getElementById('report-reason');
+            const commentEl = document.getElementById('report-comment');
+            const submitBtn = document.getElementById('report-modal-submit');
+            const cancelBtn = document.getElementById('report-modal-cancel');
+
+            subtitle.textContent = listingName || '';
+            reasonSel.value = 'fraude';
+            commentEl.value = '';
+
+            const cleanup = () => {
+                modal.classList.remove('active');
+                submitBtn.removeEventListener('click', onSubmit);
+                cancelBtn.removeEventListener('click', onCancel);
+                modal.removeEventListener('click', onBackdrop);
+                submitBtn.disabled = false;
+            };
+            const onCancel = () => cleanup();
+            const onBackdrop = (e) => { if (e.target === modal) cleanup(); };
+            const onSubmit = async () => {
+                submitBtn.disabled = true;
+                const reason = reasonSel.value;
+                const comment = commentEl.value.trim() || null;
+
+                const { error } = await supabaseClient
+                    .from('reports')
+                    .insert({
+                        listing_id: listingId,
+                        reporter_phone: currentUser.phone,
+                        reason,
+                        comment
+                    });
+
+                if (error) {
+                    // 23505 = unique_violation (déjà signalé, mais on affiche un message neutre)
+                    if (error.code === '23505') {
+                        showToast('Vous avez déjà signalé cette annonce.', 'info');
+                    } else {
+                        showToast('Erreur lors de l\'envoi du signalement : ' + error.message, 'error');
+                    }
+                    cleanup();
+                    return;
+                }
+
+                cleanup();
+                showToast('Merci, votre signalement a été enregistré. Notre équipe va l\'examiner.', 'success');
+            };
+
+            submitBtn.addEventListener('click', onSubmit);
+            cancelBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onBackdrop);
+            modal.classList.add('active');
+        }
+
         async function compressImage(file, maxWidth = 1600, quality = 0.82) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2566,6 +2676,7 @@
                 .from('listings')
                 .select('*')
                 .eq('city', currentCity)
+                .eq('status', 'active')
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -3141,6 +3252,7 @@
                 <div class="listings-grid" style="padding-top:14px;">
                     ${myListings.map(listing => {
                         const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+                        const statusBadge = renderStatusBadge(listing.status);
                         return `
                         <div class="listing-card ${listing.photo_url ? 'has-photo' : ''}">
                             ${renderPhotoStrip(listing)}
@@ -3155,6 +3267,7 @@
                                         <div class="listing-separator"></div>
                                         <div class="listing-type">${listing.type === 'service' ? 'Service' : 'Location'}</div>
                                     </div>
+                                    ${statusBadge}
                                     <p class="listing-description">${listing.description}</p>
                                     <div class="listing-footer">
                                         <div class="listing-price">${listing.price}</div>
@@ -3168,6 +3281,23 @@
                             </div>
                         </div>
                     `;}).join('')}
+                </div>
+            `;
+        }
+
+        // Badge de status pour l'auteur de l'annonce (visible uniquement dans Mes annonces)
+        function renderStatusBadge(status) {
+            if (!status || status === 'active') return '';
+            const config = {
+                flagged: { color: 'var(--orange)', bg: '#FFF1EC', label: 'En cours de vérification', icon: 'ti-flag' },
+                hidden:  { color: '#854F0B', bg: 'var(--warning-bg)', label: 'Masquée par la modération', icon: 'ti-eye-off' },
+                banned:  { color: 'var(--danger)', bg: '#FBE9E7', label: 'Annonce retirée', icon: 'ti-ban' }
+            }[status];
+            if (!config) return '';
+            return `
+                <div style="display:inline-flex;align-items:center;gap:6px;background:${config.bg};color:${config.color};font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;margin:6px 0 4px;">
+                    <i class="ti ${config.icon}" style="font-size:12px;" aria-hidden="true"></i>
+                    <span>${config.label}</span>
                 </div>
             `;
         }
@@ -3241,6 +3371,7 @@
             const { data: favListingsRaw, error: favErr } = await supabaseClient
                 .from('listings')
                 .select('*')
+                .eq('status', 'active')
                 .in('id', favIds);
 
             if (favErr) {
@@ -3983,6 +4114,13 @@
                     <button class="btn-primary" style="flex:1;" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
                         <i class="ti ti-brand-whatsapp" style="font-size:16px;" aria-hidden="true"></i>
                         <span>Contacter via WhatsApp</span>
+                    </button>
+                </div>
+
+                <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+                    <button type="button" onclick="openReportModal(${listing.id}, ${JSON.stringify(listing.name)})" style="background:none;border:0;font-size:12px;color:var(--text-light);cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                        <i class="ti ti-flag" style="font-size:13px;" aria-hidden="true"></i>
+                        <span>Un problème avec cette annonce ? Signaler</span>
                     </button>
                 </div>
             `;
