@@ -604,7 +604,26 @@
             display: flex;
             gap: 12px;
             align-items: flex-start;
+            position: relative;
         }
+
+        .listing-fav-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 15px;
+            z-index: 2;
+        }
+
+        .listing-fav-btn.active { color: var(--orange); }
 
         .listing-image {
             width: 52px;
@@ -617,6 +636,7 @@
             font-size: 22px;
             flex-shrink: 0;
             position: relative;
+            cursor: pointer;
         }
 
         .listing-badge {
@@ -1447,23 +1467,43 @@
             <div class="auth-hero">
                 <div class="auth-logo"><span>B</span></div>
                 <h1>Bienvenue sur BamsGo</h1>
-                <p id="auth-subtitle">Choisissez votre type de compte</p>
+                <p id="auth-subtitle">Connectez-vous ou créez un compte</p>
             </div>
             <div class="auth-card">
-                <div class="account-type-selector" id="account-type-selector">
-                    <div class="account-type-card" data-type="client" onclick="selectAccountType('client')">
-                        <div class="icon-wrap"><i class="ti ti-user" style="color:var(--cream);" aria-hidden="true"></i></div>
-                        <div class="label">Client</div>
-                        <div class="sublabel">Trouver des services</div>
-                    </div>
-                    <div class="account-type-card" data-type="prestataire" onclick="selectAccountType('prestataire')">
-                        <div class="icon-wrap"><i class="ti ti-briefcase" style="color:var(--cream);" aria-hidden="true"></i></div>
-                        <div class="label">Prestataire</div>
-                        <div class="sublabel">Proposer mes services</div>
-                    </div>
+                <div class="type-toggle-row">
+                    <button type="button" class="type-toggle active" id="auth-tab-login" onclick="switchAuthTab('login')">Se connecter</button>
+                    <button type="button" class="type-toggle" id="auth-tab-signup" onclick="switchAuthTab('signup')">Créer un compte</button>
                 </div>
 
-                <form id="auth-form">
+                <!-- Login Form -->
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Numéro de téléphone</label>
+                        <input type="tel" class="form-input" id="login-phone" required placeholder="+243 XXX XXX XXX">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-input" id="login-password" required placeholder="Votre mot de passe">
+                    </div>
+                    <p id="login-error" style="color:var(--danger);font-size:12.5px;margin-bottom:14px;display:none;"></p>
+                    <button type="submit" class="btn-primary">Se connecter</button>
+                </form>
+
+                <!-- Signup Form -->
+                <form id="auth-form" style="display:none;">
+                    <div class="account-type-selector" id="account-type-selector">
+                        <div class="account-type-card" data-type="client" onclick="selectAccountType('client')">
+                            <div class="icon-wrap"><i class="ti ti-user" style="color:var(--cream);" aria-hidden="true"></i></div>
+                            <div class="label">Client</div>
+                            <div class="sublabel">Trouver des services</div>
+                        </div>
+                        <div class="account-type-card" data-type="prestataire" onclick="selectAccountType('prestataire')">
+                            <div class="icon-wrap"><i class="ti ti-briefcase" style="color:var(--cream);" aria-hidden="true"></i></div>
+                            <div class="label">Prestataire</div>
+                            <div class="sublabel">Proposer mes services</div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label">Nom complet</label>
                         <input type="text" class="form-input" id="auth-name" required placeholder="Ex: Jean Kabamba">
@@ -1471,6 +1511,10 @@
                     <div class="form-group">
                         <label class="form-label">Numéro de téléphone</label>
                         <input type="tel" class="form-input" id="auth-phone" required placeholder="+243 XXX XXX XXX">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-input" id="auth-password" required placeholder="6 caractères minimum" minlength="6">
                     </div>
                     <div class="form-group" id="prestataire-fields" style="display: none;">
                         <label class="form-label">Spécialité</label>
@@ -1483,6 +1527,7 @@
                             <option value="maison">Services à domicile</option>
                         </select>
                     </div>
+                    <p id="signup-error" style="color:var(--danger);font-size:12.5px;margin-bottom:14px;display:none;"></p>
                     <button type="submit" class="btn-primary">Créer mon compte</button>
                 </form>
             </div>
@@ -1579,11 +1624,11 @@
                 </div>
 
                 <div class="account-menu">
-                    <button class="account-menu-item" onclick="alert('Mes annonces : fonctionnalité à venir')">
+                    <button class="account-menu-item" onclick="showMyListings()">
                         <div class="menu-icon"><i class="ti ti-notes" aria-hidden="true"></i></div>
                         <span>Mes annonces</span>
                     </button>
-                    <button class="account-menu-item" onclick="alert('Favoris : fonctionnalité à venir')">
+                    <button class="account-menu-item" onclick="showFavorites()">
                         <div class="menu-icon"><i class="ti ti-heart" aria-hidden="true"></i></div>
                         <span>Favoris</span>
                     </button>
@@ -1591,11 +1636,11 @@
                         <div class="menu-icon"><i class="ti ti-history" aria-hidden="true"></i></div>
                         <span>Historique des contacts</span>
                     </button>
-                    <button class="account-menu-item" onclick="alert('Paramètres : fonctionnalité à venir')">
+                    <button class="account-menu-item" onclick="showSettings()">
                         <div class="menu-icon"><i class="ti ti-settings" aria-hidden="true"></i></div>
                         <span>Paramètres</span>
                     </button>
-                    <button class="account-menu-item" onclick="alert('Aide : fonctionnalité à venir')">
+                    <button class="account-menu-item" onclick="showHelp()">
                         <div class="menu-icon"><i class="ti ti-help-circle" aria-hidden="true"></i></div>
                         <span>Aide & support</span>
                     </button>
@@ -2039,13 +2084,21 @@
         });
 
         // Check Authentication
+        // Convertit un numéro de téléphone en "email" technique pour Supabase Auth
+        // (Supabase Auth exige un email ; l'utilisateur ne voit jamais cette valeur)
+        function phoneToAuthEmail(phone) {
+            const cleaned = phone.replace(/[^0-9]/g, '');
+            return `${cleaned}@bamsgo.local`;
+        }
+
         async function checkAuth() {
-            const savedPhone = localStorage.getItem('bamsgo_user_phone');
-            if (savedPhone) {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+
+            if (session) {
                 const { data, error } = await supabaseClient
                     .from('users')
                     .select('*')
-                    .eq('phone', savedPhone)
+                    .eq('auth_id', session.user.id)
                     .single();
 
                 if (data && !error) {
@@ -2075,6 +2128,17 @@
             updateNotificationBadge();
         }
 
+        // Switch between login and signup tabs
+        function switchAuthTab(tab) {
+            const isLogin = tab === 'login';
+            document.getElementById('auth-tab-login').classList.toggle('active', isLogin);
+            document.getElementById('auth-tab-signup').classList.toggle('active', !isLogin);
+            document.getElementById('login-form').style.display = isLogin ? 'block' : 'none';
+            document.getElementById('auth-form').style.display = isLogin ? 'none' : 'block';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('signup-error').style.display = 'none';
+        }
+
         // Select Account Type
         function selectAccountType(type) {
             selectedAccountType = type;
@@ -2092,52 +2156,111 @@
             }
         }
 
-        // Auth Form Submit
-        document.getElementById('auth-form').addEventListener('submit', async function(e) {
+        // Login Form Submit
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            if (!selectedAccountType) {
-                alert('Veuillez choisir un type de compte');
-                return;
-            }
 
-            const name = document.getElementById('auth-name').value;
-            const phone = document.getElementById('auth-phone').value;
-            const specialty = document.getElementById('auth-specialty').value;
+            const phone = document.getElementById('login-phone').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            errorEl.style.display = 'none';
 
             const submitBtn = e.target.querySelector('button[type="submit"]');
             if (submitBtn) submitBtn.disabled = true;
 
-            // Vérifier si l'utilisateur existe déjà (reconnexion par téléphone)
-            const { data: existingUser } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('phone', phone)
-                .single();
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: phoneToAuthEmail(phone),
+                password: password
+            });
 
-            if (existingUser) {
-                currentUser = existingUser;
-            } else {
-                const { data: newUser, error } = await supabaseClient
-                    .from('users')
-                    .insert({
-                        name,
-                        phone,
-                        type: selectedAccountType,
-                        specialty: selectedAccountType === 'prestataire' ? specialty : null
-                    })
-                    .select()
-                    .single();
-
-                if (error) {
-                    alert('❌ Erreur lors de la création du compte : ' + error.message);
-                    if (submitBtn) submitBtn.disabled = false;
-                    return;
-                }
-                currentUser = newUser;
+            if (error) {
+                errorEl.textContent = 'Numéro ou mot de passe incorrect.';
+                errorEl.style.display = 'block';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
             }
 
-            localStorage.setItem('bamsgo_user_phone', currentUser.phone);
+            const { data: profile, error: profileError } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('auth_id', data.user.id)
+                .single();
+
+            if (profileError || !profile) {
+                errorEl.textContent = 'Compte introuvable. Contactez le support.';
+                errorEl.style.display = 'block';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+
+            currentUser = profile;
+            if (submitBtn) submitBtn.disabled = false;
+            showMainApp();
+        });
+
+        // Signup Form Submit
+        document.getElementById('auth-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const errorEl = document.getElementById('signup-error');
+            errorEl.style.display = 'none';
+            
+            if (!selectedAccountType) {
+                errorEl.textContent = 'Veuillez choisir un type de compte.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const name = document.getElementById('auth-name').value.trim();
+            const phone = document.getElementById('auth-phone').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const specialty = document.getElementById('auth-specialty').value;
+
+            if (password.length < 6) {
+                errorEl.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            // 1. Créer le compte d'authentification Supabase
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                email: phoneToAuthEmail(phone),
+                password: password
+            });
+
+            if (authError) {
+                errorEl.textContent = authError.message.includes('already registered')
+                    ? 'Ce numéro est déjà utilisé. Essayez de vous connecter.'
+                    : 'Erreur : ' + authError.message;
+                errorEl.style.display = 'block';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+
+            // 2. Créer le profil BamsGo lié à ce compte
+            const { data: newUser, error: profileError } = await supabaseClient
+                .from('users')
+                .insert({
+                    auth_id: authData.user.id,
+                    name,
+                    phone,
+                    type: selectedAccountType,
+                    specialty: selectedAccountType === 'prestataire' ? specialty : null
+                })
+                .select()
+                .single();
+
+            if (profileError) {
+                errorEl.textContent = 'Erreur lors de la création du profil : ' + profileError.message;
+                errorEl.style.display = 'block';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+
+            currentUser = newUser;
             if (submitBtn) submitBtn.disabled = false;
             showMainApp();
         });
@@ -2158,29 +2281,55 @@
         }
 
         // Logout
-        function logout() {
+        async function logout() {
             if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-                localStorage.removeItem('bamsgo_user_phone');
+                await supabaseClient.auth.signOut();
                 currentUser = null;
                 showAuthPage();
             }
         }
 
         // Navigation Functions
-        function showHome() {
-            setActiveNav('nav-home');
-            document.getElementById('categories-view').style.display = 'block';
+        // Liste de toutes les vues dynamiques créées après le chargement initial
+        const DYNAMIC_VIEW_IDS = ['messages-view', 'my-listings-view', 'favorites-view', 'search-view', 'settings-view', 'help-view'];
+
+        // Cache toutes les vues (statiques + dynamiques) avant d'en afficher une nouvelle
+        function hideAllViews() {
+            document.getElementById('categories-view').style.display = 'none';
             document.getElementById('listings-view').style.display = 'none';
             document.getElementById('account-page').style.display = 'none';
-            const messagesView = document.getElementById('messages-view');
-            if (messagesView) messagesView.style.display = 'none';
+            DYNAMIC_VIEW_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        }
+
+        // Crée (si besoin) et retourne un conteneur de vue dynamique, prêt à recevoir du contenu
+        function getOrCreateView(viewId) {
+            const mainApp = document.getElementById('main-app');
+            let view = document.getElementById(viewId);
+            if (!view) {
+                view = document.createElement('div');
+                view.id = viewId;
+                view.style.padding = '1.25rem 0 100px';
+                mainApp.appendChild(view);
+            }
+            view.style.display = 'block';
+            return view;
+        }
+
+        function showHome() {
+            setActiveNav('nav-home');
+            hideAllViews();
+            document.getElementById('categories-view').style.display = 'block';
             currentCategory = null;
             renderCategories();
         }
 
         function showSearch() {
             setActiveNav('nav-search');
-            alert('🔍 Recherche\n\nFonctionnalité à venir :\n• Recherche par mot-clé\n• Filtres avancés\n• Recherche vocale');
+            hideAllViews();
+            renderSearchView();
         }
 
         async function showMessages() {
@@ -2190,22 +2339,9 @@
             }
             
             setActiveNav('nav-messages');
-            document.getElementById('categories-view').style.display = 'none';
-            document.getElementById('listings-view').style.display = 'none';
-            document.getElementById('account-page').style.display = 'none';
+            hideAllViews();
+            const messagesView = getOrCreateView('messages-view');
             
-            // Create messages view
-            const mainApp = document.getElementById('main-app');
-            let messagesView = document.getElementById('messages-view');
-            
-            if (!messagesView) {
-                messagesView = document.createElement('div');
-                messagesView.id = 'messages-view';
-                messagesView.style.padding = '1.25rem';
-                mainApp.appendChild(messagesView);
-            }
-            
-            messagesView.style.display = 'block';
             messagesView.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Chargement...</div>';
 
             // Get contacts history from Supabase
@@ -2316,17 +2452,408 @@
             openRatingModal(listingId);
         }
 
-        function showAccountPage() {
-            setActiveNav('nav-account');
-            document.getElementById('categories-view').style.display = 'none';
-            document.getElementById('listings-view').style.display = 'none';
-            const messagesView = document.getElementById('messages-view');
-            if (messagesView) messagesView.style.display = 'none';
-            document.getElementById('account-page').style.display = 'block';
+        // ========== MES ANNONCES ==========
+
+        async function showMyListings() {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour voir vos annonces');
+                return;
+            }
+
+            hideAllViews();
+            const view = getOrCreateView('my-listings-view');
+            view.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Chargement...</div>';
+
+            const { data: myListings, error } = await supabaseClient
+                .from('listings')
+                .select('*')
+                .eq('user_id', currentUser.phone)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erreur chargement mes annonces:', error);
+                view.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Erreur de chargement</div>';
+                return;
+            }
+
+            if (!myListings || myListings.length === 0) {
+                view.innerHTML = `
+                    <div class="listings-header-bar">
+                        <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
+                        <h2 class="section-title">Mes annonces</h2>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="ti ti-notes" aria-hidden="true"></i></div>
+                        <h3>Aucune annonce publiée</h3>
+                        <p>Publiez votre première annonce depuis le bouton +</p>
+                    </div>
+                `;
+                return;
+            }
+
+            view.innerHTML = `
+                <div class="listings-header-bar">
+                    <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
+                    <h2 class="section-title">Mes annonces (${myListings.length})</h2>
+                </div>
+                <div class="listings-grid" style="padding-top:14px;">
+                    ${myListings.map(listing => {
+                        const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+                        return `
+                        <div class="listing-card">
+                            <div class="listing-image">
+                                <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
+                            </div>
+                            <div class="listing-content">
+                                <h3 class="listing-title">${listing.name}</h3>
+                                <div class="listing-meta">
+                                    <div class="listing-location"><i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i><span>${listing.quartier}</span></div>
+                                    <div class="listing-separator"></div>
+                                    <div class="listing-type">${listing.type === 'service' ? 'Service' : 'Location'}</div>
+                                </div>
+                                <p class="listing-description">${listing.description}</p>
+                                <div class="listing-footer">
+                                    <div class="listing-price">${listing.price}</div>
+                                    <div style="display:flex;gap:8px;">
+                                        <button class="btn-contact" style="background:var(--white);color:var(--navy);border:1.5px solid var(--border);" onclick="deleteMyListing(${listing.id})">
+                                            <i class="ti ti-trash" style="font-size:14px;" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;}).join('')}
+                </div>
+            `;
         }
 
-        function showNotifications() {
-            alert('🔔 Notifications\n\nVous avez 3 nouvelles notifications :\n• Nouvelle annonce disponible\n• Message reçu\n• Favoris mis à jour');
+        async function deleteMyListing(listingId) {
+            if (!confirm('Supprimer définitivement cette annonce ?')) return;
+
+            const { error } = await supabaseClient
+                .from('listings')
+                .delete()
+                .eq('id', listingId);
+
+            if (error) {
+                alert('Erreur lors de la suppression : ' + error.message);
+                return;
+            }
+
+            listings = listings.filter(l => l.id !== listingId);
+            showMyListings();
+        }
+
+        // ========== FAVORIS ==========
+
+        async function showFavorites() {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour voir vos favoris');
+                return;
+            }
+
+            hideAllViews();
+            const view = getOrCreateView('favorites-view');
+            view.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Chargement...</div>';
+
+            const { data: favs, error } = await supabaseClient
+                .from('favorites')
+                .select('listing_id')
+                .eq('user_id', currentUser.phone)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erreur chargement favoris:', error);
+                view.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Erreur de chargement</div>';
+                return;
+            }
+
+            const favIds = (favs || []).map(f => f.listing_id);
+            const favListings = listings.filter(l => favIds.includes(l.id));
+
+            if (favListings.length === 0) {
+                view.innerHTML = `
+                    <div class="listings-header-bar">
+                        <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
+                        <h2 class="section-title">Favoris</h2>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="ti ti-heart" aria-hidden="true"></i></div>
+                        <h3>Aucun favori</h3>
+                        <p>Touchez le cœur sur une annonce pour la sauvegarder ici</p>
+                    </div>
+                `;
+                return;
+            }
+
+            await loadRatingsCache();
+
+            view.innerHTML = `
+                <div class="listings-header-bar">
+                    <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
+                    <h2 class="section-title">Favoris (${favListings.length})</h2>
+                </div>
+                <div class="listings-grid" style="padding-top:14px;">
+                    ${favListings.map(listing => {
+                        const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+                        return `
+                        <div class="listing-card">
+                            <div class="listing-image">
+                                <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
+                            </div>
+                            <div class="listing-content">
+                                <h3 class="listing-title">${listing.name}</h3>
+                                <div class="listing-meta">
+                                    <div class="listing-location"><i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i><span>${listing.quartier}</span></div>
+                                </div>
+                                ${getRatingHTML(listing.id)}
+                                <p class="listing-description">${listing.description}</p>
+                                <div class="listing-footer">
+                                    <div class="listing-price">${listing.price}</div>
+                                    <div style="display:flex;gap:8px;">
+                                        <button class="btn-contact" style="background:var(--white);color:var(--danger);border:1.5px solid var(--border);" onclick="toggleFavorite(${listing.id}, true)">
+                                            <i class="ti ti-heart-off" style="font-size:14px;" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn-contact" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
+                                            <i class="ti ti-brand-whatsapp" style="font-size:14px;" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;}).join('')}
+                </div>
+            `;
+        }
+
+        async function toggleFavorite(listingId, isCurrentlyFavorite) {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour ajouter des favoris');
+                return;
+            }
+
+            if (isCurrentlyFavorite) {
+                await supabaseClient
+                    .from('favorites')
+                    .delete()
+                    .eq('user_id', currentUser.phone)
+                    .eq('listing_id', listingId);
+            } else {
+                await supabaseClient
+                    .from('favorites')
+                    .insert({ user_id: currentUser.phone, listing_id: listingId });
+            }
+
+            // Rafraîchir la vue actuelle si c'est celle des favoris ou des annonces
+            const favView = document.getElementById('favorites-view');
+            if (favView && favView.style.display !== 'none') {
+                showFavorites();
+            } else if (currentCategory) {
+                renderListings();
+            }
+        }
+
+        async function isListingFavorited(listingId) {
+            if (!currentUser) return false;
+            const { data } = await supabaseClient
+                .from('favorites')
+                .select('id')
+                .eq('user_id', currentUser.phone)
+                .eq('listing_id', listingId)
+                .maybeSingle();
+            return !!data;
+        }
+
+        // ========== RECHERCHE ==========
+
+        async function renderSearchView() {
+            const view = getOrCreateView('search-view');
+            view.innerHTML = `
+                <div class="search-bar-wrap" style="padding:0 0 16px;">
+                    <div class="search-bar">
+                        <i class="ti ti-search" style="font-size:16px;" aria-hidden="true"></i>
+                        <input type="text" id="search-input" placeholder="Rechercher un service, un métier..."
+                               style="border:none;background:none;flex:1;font-size:13.5px;outline:none;color:var(--text-dark);"
+                               oninput="handleSearchInput()">
+                    </div>
+                </div>
+                <div class="listings-grid" id="search-results" style="padding:0;"></div>
+            `;
+            document.getElementById('search-input').focus();
+            renderSearchResults('');
+        }
+
+        let searchDebounceTimer = null;
+        function handleSearchInput() {
+            clearTimeout(searchDebounceTimer);
+            const query = document.getElementById('search-input').value;
+            searchDebounceTimer = setTimeout(() => renderSearchResults(query), 200);
+        }
+
+        async function renderSearchResults(query) {
+            const container = document.getElementById('search-results');
+            if (!container) return;
+
+            const trimmed = query.trim().toLowerCase();
+            if (trimmed.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="ti ti-search" aria-hidden="true"></i></div>
+                        <h3>Que recherchez-vous ?</h3>
+                        <p>Nom, métier, catégorie ou quartier</p>
+                    </div>
+                `;
+                return;
+            }
+
+            await loadRatingsCache();
+
+            const results = listings.filter(l =>
+                l.city === currentCity && (
+                    l.name.toLowerCase().includes(trimmed) ||
+                    (l.service && l.service.toLowerCase().includes(trimmed)) ||
+                    l.description.toLowerCase().includes(trimmed) ||
+                    l.quartier.toLowerCase().includes(trimmed) ||
+                    l.category.toLowerCase().includes(trimmed)
+                )
+            );
+
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="ti ti-mood-empty" aria-hidden="true"></i></div>
+                        <h3>Aucun résultat</h3>
+                        <p>Essayez un autre mot-clé</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = results.map(listing => {
+                const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+                return `
+                <div class="listing-card">
+                    <div class="listing-image">
+                        <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
+                    </div>
+                    <div class="listing-content">
+                        <h3 class="listing-title">${listing.name}</h3>
+                        <div class="listing-meta">
+                            <div class="listing-location"><i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i><span>${listing.quartier}</span></div>
+                        </div>
+                        ${getRatingHTML(listing.id)}
+                        <p class="listing-description">${listing.description}</p>
+                        <div class="listing-footer">
+                            <div class="listing-price">${listing.price}</div>
+                            <button class="btn-contact" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
+                                <i class="ti ti-brand-whatsapp" style="font-size:14px;" aria-hidden="true"></i>
+                                <span>Contacter</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;}).join('');
+        }
+
+        // ========== PARAMÈTRES ==========
+
+        function showSettings() {
+            if (!currentUser) {
+                alert('Veuillez vous connecter pour accéder aux paramètres');
+                return;
+            }
+
+            hideAllViews();
+            const view = getOrCreateView('settings-view');
+            view.innerHTML = `
+                <div class="listings-header-bar">
+                    <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
+                    <h2 class="section-title">Paramètres</h2>
+                </div>
+                <div style="padding:16px 20px 0;">
+                    <div class="form-group">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" class="form-input" id="settings-name" value="${currentUser.name}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Numéro de téléphone</label>
+                        <input type="tel" class="form-input" id="settings-phone" value="${currentUser.phone}" disabled style="opacity:0.6;">
+                    </div>
+                    <p id="settings-message" style="font-size:12.5px;margin-bottom:14px;display:none;"></p>
+                    <button class="btn-primary" onclick="saveSettings()">Enregistrer les modifications</button>
+                </div>
+            `;
+        }
+
+        async function saveSettings() {
+            const newName = document.getElementById('settings-name').value.trim();
+            const messageEl = document.getElementById('settings-message');
+
+            if (newName.length < 2) {
+                messageEl.style.color = 'var(--danger)';
+                messageEl.textContent = 'Le nom doit contenir au moins 2 caractères.';
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('users')
+                .update({ name: newName })
+                .eq('id', currentUser.id);
+
+            if (error) {
+                messageEl.style.color = 'var(--danger)';
+                messageEl.textContent = 'Erreur : ' + error.message;
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            currentUser.name = newName;
+            updateAccountInfo();
+            messageEl.style.color = 'var(--success)';
+            messageEl.textContent = 'Modifications enregistrées.';
+            messageEl.style.display = 'block';
+        }
+
+        // ========== AIDE & SUPPORT ==========
+
+        function showHelp() {
+            hideAllViews();
+            const view = getOrCreateView('help-view');
+            const faqs = [
+                { q: 'Comment publier une annonce ?', a: "Touchez le bouton + en bas de l'écran, choisissez Service ou Location, puis remplissez le formulaire. Les clients peuvent publier des locations ; seuls les prestataires peuvent publier des services." },
+                { q: 'Comment contacter un prestataire ?', a: 'Touchez "Contacter" sur une annonce pour ouvrir WhatsApp directement avec ce prestataire, ou consultez sa fiche pour voir son numéro.' },
+                { q: 'Les annonces sont-elles gratuites ?', a: "Oui, la publication d'annonces est 100% gratuite sur BamsGo." },
+                { q: 'Comment noter un prestataire ?', a: 'Après avoir contacté un prestataire, rendez-vous dans Messages puis touchez "Noter ce service" une fois la prestation terminée.' },
+                { q: "Mes annonces n'apparaissent pas ?", a: 'Vérifiez que vous êtes bien dans la bonne ville et catégorie. Les annonces sont spécifiques à chaque ville.' }
+            ];
+            view.innerHTML = `
+                <div class="listings-header-bar">
+                    <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
+                    <h2 class="section-title">Aide & support</h2>
+                </div>
+                <div style="padding:16px 20px 0;">
+                    ${faqs.map((faq, i) => `
+                        <div class="account-menu-item" style="flex-direction:column;align-items:flex-start;cursor:pointer;" onclick="this.querySelector('.faq-answer').style.display = this.querySelector('.faq-answer').style.display === 'none' ? 'block' : 'none';">
+                            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                                <span style="font-weight:600;">${faq.q}</span>
+                                <i class="ti ti-chevron-down" style="font-size:14px;" aria-hidden="true"></i>
+                            </div>
+                            <p class="faq-answer" style="display:none;font-size:12.5px;color:var(--text-medium);margin-top:8px;line-height:1.5;">${faq.a}</p>
+                        </div>
+                    `).join('')}
+                    <button class="btn-primary" style="margin-top:16px;" onclick="window.open('https://wa.me/243000000000', '_blank')">
+                        <i class="ti ti-brand-whatsapp" style="font-size:16px;" aria-hidden="true"></i>
+                        <span>Contacter le support</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function showAccountPage() {
+            setActiveNav('nav-account');
+            hideAllViews();
+            document.getElementById('account-page').style.display = 'block';
         }
 
         function setActiveNav(activeId) {
@@ -2346,9 +2873,8 @@
 
         function showCategories() {
             currentCategory = null;
+            hideAllViews();
             document.getElementById('categories-view').style.display = 'block';
-            document.getElementById('listings-view').style.display = 'none';
-            document.getElementById('account-page').style.display = 'none';
             setActiveNav('nav-home');
             renderCategories();
         }
@@ -2368,9 +2894,8 @@
         function showListings(categoryId) {
             currentCategory = categoryId;
             currentQuartier = '';
-            document.getElementById('categories-view').style.display = 'none';
+            hideAllViews();
             document.getElementById('listings-view').style.display = 'block';
-            document.getElementById('account-page').style.display = 'none';
             
             const category = categories[currentTab].find(c => c.id === categoryId);
             document.getElementById('listings-title').textContent = category.title;
@@ -2391,11 +2916,25 @@
             renderListings();
         }
 
+        // Cache local des favoris de l'utilisateur connecté
+        let favoritesCache = new Set();
+
+        async function loadFavoritesCache() {
+            if (!currentUser) { favoritesCache = new Set(); return; }
+            const { data, error } = await supabaseClient
+                .from('favorites')
+                .select('listing_id')
+                .eq('user_id', currentUser.phone);
+            if (error) { console.error('Erreur chargement favoris:', error); return; }
+            favoritesCache = new Set((data || []).map(f => f.listing_id));
+        }
+
         async function renderListings() {
             const grid = document.getElementById('listings-grid');
             const emptyState = document.getElementById('empty-state');
 
             await loadRatingsCache();
+            await loadFavoritesCache();
             
             let filtered = listings.filter(l => 
                 l.type === currentTab && 
@@ -2413,13 +2952,17 @@
                 
                 grid.innerHTML = filtered.map(listing => {
                     const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+                    const isFav = favoritesCache.has(listing.id);
                     return `
                     <div class="listing-card">
-                        <div class="listing-image">
+                        <button class="listing-fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${listing.id}, ${isFav})" aria-label="Favori">
+                            <i class="ti ${isFav ? 'ti-heart-filled' : 'ti-heart'}" aria-hidden="true"></i>
+                        </button>
+                        <div class="listing-image" onclick="openListingDetail(${listing.id})">
                             <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
                             <div class="listing-badge">${listing.type === 'service' ? 'SERVICE' : 'LOCATION'}</div>
                         </div>
-                        <div class="listing-content">
+                        <div class="listing-content" onclick="openListingDetail(${listing.id})" style="cursor:pointer;">
                             <h3 class="listing-title">${listing.name}</h3>
                             <div class="listing-meta">
                                 <div class="listing-location">
@@ -2435,7 +2978,7 @@
                             <p class="listing-description">${listing.description}</p>
                             <div class="listing-footer">
                                 <div class="listing-price">${listing.price}</div>
-                                <button class="btn-contact" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
+                                <button class="btn-contact" onclick="event.stopPropagation(); handleContactClick(${listing.id}, '${listing.phone}')">
                                     <i class="ti ti-brand-whatsapp" style="font-size:14px;" aria-hidden="true"></i>
                                     <span>Contacter</span>
                                 </button>
@@ -2649,6 +3192,83 @@
         // ========== REVIEWS DETAIL MODAL ==========
 
         // Open reviews detail modal
+        // ========== FICHE DÉTAILLÉE (avec contact via le site) ==========
+
+        async function openListingDetail(listingId) {
+            const listing = listings.find(l => l.id === listingId);
+            if (!listing) return;
+
+            await loadRatingsCache();
+            await loadFavoritesCache();
+            const rating = getListingRating(listingId);
+            const isFav = favoritesCache.has(listingId);
+            const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+
+            document.getElementById('reviews-modal-title').textContent = listing.name;
+            const body = document.getElementById('reviews-modal-body');
+            body.innerHTML = `
+                <div style="text-align:center;padding:8px 0 20px;">
+                    <div style="width:64px;height:64px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                        <i class="ti ${iconClass}" style="color:var(--orange);font-size:28px;" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="font-display" style="font-size:18px;font-weight:600;margin-bottom:4px;">${listing.name}</h3>
+                    <p style="font-size:12.5px;color:var(--text-medium);">${listing.service || (listing.type === 'service' ? 'Service' : 'Location')}</p>
+                </div>
+
+                <div style="display:flex;gap:10px;margin-bottom:18px;">
+                    <div style="flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:12px;text-align:center;">
+                        <p style="font-size:11px;color:var(--text-light);margin-bottom:3px;">Tarif</p>
+                        <p style="font-size:13.5px;font-weight:600;">${listing.price}</p>
+                    </div>
+                    <div style="flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:12px;text-align:center;">
+                        <p style="font-size:11px;color:var(--text-light);margin-bottom:3px;">Quartier</p>
+                        <p style="font-size:13.5px;font-weight:600;">${listing.quartier}</p>
+                    </div>
+                </div>
+
+                ${rating.count > 0 ? `
+                    <div onclick="openReviewsModal(${listing.id})" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--warning-bg);padding:10px 14px;border-radius:var(--radius-md);margin-bottom:18px;">
+                        <i class="ti ti-star-filled" style="color:var(--warning-text);font-size:14px;" aria-hidden="true"></i>
+                        <span style="font-size:13px;font-weight:600;color:#412402;">${rating.average}</span>
+                        <span style="font-size:12px;color:var(--warning-text);">(${rating.count} avis) — voir tout</span>
+                    </div>
+                ` : ''}
+
+                <p style="font-size:11.5px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">À propos</p>
+                <p style="font-size:13.5px;color:var(--text-dark);line-height:1.55;margin-bottom:24px;">${listing.description}</p>
+
+                <p style="font-size:11.5px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Contact</p>
+                <div style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <i class="ti ti-phone" style="font-size:16px;color:var(--text-medium);" aria-hidden="true"></i>
+                        <span style="font-size:14px;font-weight:600;">${listing.phone}</span>
+                    </div>
+                    <button onclick="copyPhoneNumber('${listing.phone}')" style="font-size:11.5px;font-weight:600;color:var(--orange-dark);">Copier</button>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                    <button class="listing-fav-btn ${isFav ? 'active' : ''}" style="position:static;width:48px;height:48px;border:1.5px solid var(--border);flex-shrink:0;" onclick="toggleFavorite(${listing.id}, ${isFav}); openListingDetail(${listing.id});" aria-label="Favori">
+                        <i class="ti ${isFav ? 'ti-heart-filled' : 'ti-heart'}" style="font-size:18px;" aria-hidden="true"></i>
+                    </button>
+                    <button class="btn-primary" style="flex:1;" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
+                        <i class="ti ti-brand-whatsapp" style="font-size:16px;" aria-hidden="true"></i>
+                        <span>Contacter via WhatsApp</span>
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('reviews-modal').classList.add('active');
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function copyPhoneNumber(phone) {
+            navigator.clipboard.writeText(phone).then(() => {
+                alert('Numéro copié : ' + phone);
+            }).catch(() => {
+                alert('Numéro : ' + phone);
+            });
+        }
+
         async function openReviewsModal(listingId) {
             const listing = listings.find(l => l.id === listingId);
             if (!listing) return;
