@@ -3189,13 +3189,10 @@
         }
 
         // Form Submit with validation and error handling, saved to Supabase
-        document.addEventListener('DOMContentLoaded', function() {
-            const postForm = document.getElementById('post-form');
-            if (!postForm) {
-                console.error('Post form not found!');
-                return;
-            }
-            
+        const postForm = document.getElementById('post-form');
+        if (!postForm) {
+            console.error('Post form not found!');
+        } else {
             postForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -3320,7 +3317,7 @@
                     if (submitBtn) submitBtn.disabled = false;
                 }
             });
-        });
+        }
 
         function getIconForCategory(category) {
             return categoryIconMap[category] || 'ti-package';
@@ -3818,52 +3815,50 @@
         }
 
         // Handle star rating click
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.star-rating').forEach(ratingContainer => {
-                const criterionNum = ratingContainer.dataset.criterion;
-                const stars = ratingContainer.querySelectorAll('.star');
-                
-                stars.forEach((star, index) => {
-                    // Click event
-                    star.addEventListener('click', function() {
-                        const value = parseInt(this.dataset.value);
-                        currentRatings[`criterion${criterionNum}`] = value;
-                        
-                        // Update stars display
-                        stars.forEach((s, i) => {
-                            if (i < value) {
-                                s.textContent = '★';
-                                s.classList.add('active');
-                            } else {
-                                s.textContent = '☆';
-                                s.classList.remove('active');
-                            }
-                        });
-                    });
+        document.querySelectorAll('.star-rating').forEach(ratingContainer => {
+            const criterionNum = ratingContainer.dataset.criterion;
+            const stars = ratingContainer.querySelectorAll('.star');
+            
+            stars.forEach((star, index) => {
+                // Click event
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    currentRatings[`criterion${criterionNum}`] = value;
                     
-                    // Hover effect
-                    star.addEventListener('mouseenter', function() {
-                        const value = parseInt(this.dataset.value);
-                        stars.forEach((s, i) => {
-                            if (i < value) {
-                                s.textContent = '★';
-                            } else {
-                                s.textContent = '☆';
-                            }
-                        });
+                    // Update stars display
+                    stars.forEach((s, i) => {
+                        if (i < value) {
+                            s.textContent = '★';
+                            s.classList.add('active');
+                        } else {
+                            s.textContent = '☆';
+                            s.classList.remove('active');
+                        }
                     });
                 });
                 
-                // Mouse leave - restore selected rating
-                ratingContainer.addEventListener('mouseleave', function() {
-                    const selectedValue = currentRatings[`criterion${criterionNum}`];
+                // Hover effect
+                star.addEventListener('mouseenter', function() {
+                    const value = parseInt(this.dataset.value);
                     stars.forEach((s, i) => {
-                        if (i < selectedValue) {
+                        if (i < value) {
                             s.textContent = '★';
                         } else {
                             s.textContent = '☆';
                         }
                     });
+                });
+            });
+            
+            // Mouse leave - restore selected rating
+            ratingContainer.addEventListener('mouseleave', function() {
+                const selectedValue = currentRatings[`criterion${criterionNum}`];
+                stars.forEach((s, i) => {
+                    if (i < selectedValue) {
+                        s.textContent = '★';
+                    } else {
+                        s.textContent = '☆';
+                    }
                 });
             });
         });
@@ -3881,9 +3876,8 @@
         }
 
         // Submit rating
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('rating-form').addEventListener('submit', async function(e) {
-                e.preventDefault();
+        document.getElementById('rating-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
                 
                 // Check if at least one criterion is rated
                 const hasRating = Object.values(currentRatings).some(v => v > 0);
@@ -3961,7 +3955,6 @@
                     }, 2000);
                 }
             });
-        });
 
         // Show rating success
         function showRatingSuccess() {
