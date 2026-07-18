@@ -1623,7 +1623,8 @@
                 <form id="login-form">
                     <div class="form-group">
                         <label class="form-label">Numéro de téléphone</label>
-                        <input type="tel" class="form-input" id="login-phone" required placeholder="+243 XXX XXX XXX">
+                        <input type="tel" class="form-input" id="login-phone" required placeholder="+243 812 345 678">
+                        <small style="display:block;margin-top:4px;font-size:11.5px;color:var(--text-medium);">Format accepté : +243, +33, ou local (08…, 06…)</small>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Mot de passe</label>
@@ -1654,7 +1655,8 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Numéro de téléphone</label>
-                        <input type="tel" class="form-input" id="auth-phone" required placeholder="+243 XXX XXX XXX">
+                        <input type="tel" class="form-input" id="auth-phone" required placeholder="+243 812 345 678">
+                        <small style="display:block;margin-top:4px;font-size:11.5px;color:var(--text-medium);">Format accepté : +243, +33, ou local (08…, 06…)</small>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Mot de passe</label>
@@ -2240,11 +2242,57 @@
         });
 
         // Check Authentication
+        // Normalise un numéro saisi (avec espaces, tirets, points, préfixe 0 ou 00…)
+        // vers le format international E.164 : +CC + numéro sans le 0 national.
+        // Détection auto France (+33) vs RDC (+243) selon le pattern, sinon RDC par défaut.
+        // Retourne null si l'entrée est vide ou invalide.
+        function normalizePhone(input) {
+            if (!input || typeof input !== 'string') return null;
+
+            const trimmed = input.trim();
+            if (!trimmed) return null;
+
+            const hadPlus = trimmed.startsWith('+');
+            const digits = trimmed.replace(/[^0-9]/g, '');
+            if (!digits) return null;
+
+            // Déjà en format international (+ ou 00 devant l'indicatif pays)
+            if (hadPlus) return '+' + digits;
+            if (digits.startsWith('00')) return '+' + digits.slice(2);
+
+            // Numéro national avec 0 devant
+            if (digits.startsWith('0')) {
+                if (digits.length === 10) {
+                    const second = digits[1];
+                    // Mobiles français : 06, 07
+                    if (second === '6' || second === '7') return '+33' + digits.slice(1);
+                    // Mobiles RDC : 08, 09
+                    if (second === '8' || second === '9') return '+243' + digits.slice(1);
+                }
+                // Par défaut : marché cible RDC
+                return '+243' + digits.slice(1);
+            }
+
+            // Ni +, ni 00, ni 0 : on suppose un numéro RDC saisi sans indicatif
+            if (digits.length === 9) return '+243' + digits;
+
+            // Fallback : on préfixe juste + et on laisse Supabase valider
+            return '+' + digits;
+        }
+
+        // Vérifie qu'un numéro normalisé a une forme plausible (9 à 14 chiffres après le +)
+        function isValidPhone(normalized) {
+            return typeof normalized === 'string' && /^\+\d{9,14}$/.test(normalized);
+        }
+
         // Convertit un numéro de téléphone en "email" technique pour Supabase Auth
-        // (Supabase Auth exige un email ; l'utilisateur ne voit jamais cette valeur)
+        // (Supabase Auth exige un email ; l'utilisateur ne voit jamais cette valeur).
+        // Le téléphone est d'abord normalisé pour garantir l'unicité quel que soit
+        // le format saisi (+33 6 01…, 0601…, 00 33 6 01… donnent tous la même clé).
         function phoneToAuthEmail(phone) {
-            const cleaned = phone.replace(/[^0-9]/g, '');
-            return `${cleaned}@bamsgo.local`;
+            const normalized = normalizePhone(phone);
+            const digits = (normalized || '').replace(/[^0-9]/g, '');
+            return `${digits}@bamsgo.local`;
         }
 
         async function checkAuth() {
@@ -2318,10 +2366,17 @@
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const phone = document.getElementById('login-phone').value.trim();
+            const phoneRaw = document.getElementById('login-phone').value.trim();
             const password = document.getElementById('login-password').value;
             const errorEl = document.getElementById('login-error');
             errorEl.style.display = 'none';
+
+            const phone = normalizePhone(phoneRaw);
+            if (!isValidPhone(phone)) {
+                errorEl.textContent = 'Numéro de téléphone invalide.';
+                errorEl.style.display = 'block';
+                return;
+            }
 
             const submitBtn = e.target.querySelector('button[type="submit"]');
             if (submitBtn) submitBtn.disabled = true;
@@ -2370,9 +2425,16 @@
             }
 
             const name = document.getElementById('auth-name').value.trim();
-            const phone = document.getElementById('auth-phone').value.trim();
+            const phoneRaw = document.getElementById('auth-phone').value.trim();
             const password = document.getElementById('auth-password').value;
             const specialty = document.getElementById('auth-specialty').value;
+
+            const phone = normalizePhone(phoneRaw);
+            if (!isValidPhone(phone)) {
+                errorEl.textContent = 'Numéro de téléphone invalide. Exemple : +243 812 345 678 ou 0812345678';
+                errorEl.style.display = 'block';
+                return;
+            }
 
             if (password.length < 6) {
                 errorEl.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
