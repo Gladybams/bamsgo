@@ -1573,7 +1573,7 @@
                 <button class="tab" onclick="switchTab('location')" id="tab-location">Location</button>
             </div>
 
-            <div id="categories-view">
+            <div id="categories-view" style="display: none;">
                 <div class="categories-scroll" id="categories-scroll"></div>
             </div>
 
@@ -2120,6 +2120,8 @@
         async function showMainApp() {
             document.getElementById('auth-page').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
+            hideAllViews();
+            document.getElementById('categories-view').style.display = 'block';
             updateAccountInfo();
             renderCategories();
             
