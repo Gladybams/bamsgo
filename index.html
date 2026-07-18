@@ -1695,7 +1695,7 @@
                         </div>
                         <button class="icon-btn-header" onclick="showNotifications()" aria-label="Notifications">
                             <i class="ti ti-bell" style="font-size:17px;" aria-hidden="true"></i>
-                            <span class="badge">3</span>
+                            <span class="badge" style="display:none;"></span>
                         </button>
                         <button class="icon-btn-header" onclick="showAccountPage()" aria-label="Mon compte">
                             <i class="ti ti-user" style="font-size:17px;" aria-hidden="true"></i>
@@ -1745,10 +1745,10 @@
 
             <div id="account-page" class="account-page" style="display: none;">
                 <div class="account-header-card">
-                    <div class="user-avatar" id="account-avatar">J</div>
+                    <div class="user-avatar" id="account-avatar"></div>
                     <div>
-                        <div class="user-name font-display" id="account-name">Jean Kabamba</div>
-                        <span class="user-type-badge" id="account-type-badge">Client</span>
+                        <div class="user-name font-display" id="account-name"></div>
+                        <span class="user-type-badge" id="account-type-badge"></span>
                     </div>
                 </div>
 
@@ -2145,6 +2145,7 @@
             const { data, error } = await supabaseClient
                 .from('listings')
                 .select('*')
+                .eq('city', currentCity)
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -2187,23 +2188,34 @@
             dropdown.classList.toggle('active');
         }
 
-        function selectCity(cityKey) {
+        async function selectCity(cityKey) {
             const city = cities[cityKey];
-            
+
             if (!city.active) {
                 alert(`🔔 ${city.name} sera bientôt disponible !\n\nBamsGo arrive prochainement dans votre ville.\n\nEn attendant, découvrez nos services à Kolwezi ! 🚀`);
                 return;
             }
-            
+
+            if (cityKey === currentCity) {
+                toggleCityDropdown();
+                return;
+            }
+
             currentCity = cityKey;
             currentQuartier = '';
             document.getElementById('current-city').textContent = city.name;
             toggleCityDropdown();
             updateQuartierFilters();
-            
-            // If on listings view, refresh listings
+
+            // Recharger les annonces (et les notes associées) filtrées sur la nouvelle ville
+            await loadListingsFromDB();
+            await loadRatingsCache();
+
+            // Rafraîchir la vue en cours
             if (currentCategory) {
                 renderListings();
+            } else {
+                renderCategories();
             }
         }
 
@@ -2715,9 +2727,8 @@
             }
 
             const favIds = (favs || []).map(f => f.listing_id);
-            const favListings = listings.filter(l => favIds.includes(l.id));
 
-            if (favListings.length === 0) {
+            if (favIds.length === 0) {
                 view.innerHTML = `
                     <div class="listings-header-bar">
                         <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
@@ -2732,7 +2743,41 @@
                 return;
             }
 
-            await loadRatingsCache();
+            // Fetch direct des annonces favorites (cross-city : un favori doit rester accessible
+            // même si l'utilisateur a changé la ville affichée dans le header)
+            const { data: favListingsRaw, error: favErr } = await supabaseClient
+                .from('listings')
+                .select('*')
+                .in('id', favIds);
+
+            if (favErr) {
+                console.error('Erreur chargement annonces favorites:', favErr);
+                view.innerHTML = '<div style="text-align: center; padding: 3rem 1rem; color: var(--text-medium);">Erreur de chargement</div>';
+                return;
+            }
+
+            const favListings = (favListingsRaw || []).map(l => ({
+                ...l,
+                userId: l.user_id,
+                createdAt: l.created_at
+            }));
+
+            if (favListings.length === 0) {
+                view.innerHTML = `
+                    <div class="listings-header-bar">
+                        <button class="back-btn" onclick="showAccountPage()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
+                        <h2 class="section-title">Favoris</h2>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="ti ti-heart" aria-hidden="true"></i></div>
+                        <h3>Aucun favori</h3>
+                        <p>Ces annonces ne sont plus disponibles</p>
+                    </div>
+                `;
+                return;
+            }
+
+            await loadRatingsCache(favIds);
 
             view.innerHTML = `
                 <div class="listings-header-bar">
@@ -3726,7 +3771,7 @@
 
         // Update notification badge
         function updateNotificationBadge() {
-            const badge = document.querySelector('.icon-btn .badge');
+            const badge = document.querySelector('.icon-btn-header .badge');
             const unreadCount = notifications.filter(n => !n.read).length;
             
             if (badge) {
@@ -3992,17 +4037,24 @@
         let ratingsCache = {};
 
         // Charge les moyennes de toutes les notes en une seule requête groupée
-        async function loadRatingsCache() {
+        async function loadRatingsCache(customIds) {
+            ratingsCache = {};
+
+            // Par défaut, on charge les notes des annonces actuellement affichées (ville courante).
+            // Un appelant peut passer un tableau d'IDs pour un contexte différent (ex: favoris cross-city).
+            const listingIds = customIds || listings.map(l => l.id);
+            if (!listingIds.length) return;
+
             const { data, error } = await supabaseClient
                 .from('ratings')
-                .select('listing_id, average');
+                .select('listing_id, average')
+                .in('listing_id', listingIds);
 
             if (error) {
                 console.error('Erreur chargement notes:', error);
                 return;
             }
 
-            ratingsCache = {};
             data.forEach(r => {
                 if (!ratingsCache[r.listing_id]) {
                     ratingsCache[r.listing_id] = { sum: 0, count: 0 };
