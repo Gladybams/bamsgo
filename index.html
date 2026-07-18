@@ -3184,8 +3184,22 @@
             document.getElementById('modal-title').textContent = 
                 type === 'service' ? 'Proposer un Service' : 'Proposer une Location';
             
-            document.getElementById('service-form').style.display = type === 'service' ? 'block' : 'none';
-            document.getElementById('location-form').style.display = type === 'location' ? 'block' : 'none';
+            const isService = type === 'service';
+            document.getElementById('service-form').style.display = isService ? 'block' : 'none';
+            document.getElementById('location-form').style.display = isService ? 'none' : 'block';
+
+            // Un champ required caché bloque silencieusement la soumission du formulaire
+            // (le navigateur ne peut pas lui donner le focus pour signaler l'erreur).
+            // On active/désactive donc required selon le type d'annonce affiché.
+            const serviceFieldIds = ['service-category', 'service-name', 'service-type', 'service-description', 'service-quartier', 'service-phone'];
+            const locationFieldIds = ['location-category', 'location-name', 'location-description', 'location-price', 'location-quartier', 'location-phone'];
+
+            serviceFieldIds.forEach(id => {
+                document.getElementById(id).required = isService;
+            });
+            locationFieldIds.forEach(id => {
+                document.getElementById(id).required = !isService;
+            });
         }
 
         // Form Submit with validation and error handling, saved to Supabase
