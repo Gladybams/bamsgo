@@ -3710,9 +3710,9 @@
             document.getElementById('reviews-modal-title').textContent = listing.name;
             const body = document.getElementById('reviews-modal-body');
             body.innerHTML = `
-                ${listing.photo_url ? `<img src="${listing.photo_url}" class="listing-detail-photo" alt="" onerror="this.style.display='none'">` : ''}
+                ${listing.photo_url ? `<img src="${listing.photo_url}" class="listing-detail-photo" alt="" onerror="this.style.display='none'; document.getElementById('detail-icon-fallback-${listing.id}').style.display='flex';">` : ''}
                 <div style="text-align:center;padding:8px 0 20px;">
-                    <div style="width:64px;height:64px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                    <div id="detail-icon-fallback-${listing.id}" style="width:64px;height:64px;border-radius:50%;background:var(--navy);display:${listing.photo_url ? 'none' : 'flex'};align-items:center;justify-content:center;margin:0 auto 12px;">
                         <i class="ti ${iconClass}" style="color:var(--orange);font-size:28px;" aria-hidden="true"></i>
                     </div>
                     <h3 class="font-display" style="font-size:18px;font-weight:600;margin-bottom:4px;">${listing.name}</h3>
