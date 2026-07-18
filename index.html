@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#E85D04">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1E3A5F">
     <meta name="description" content="BamsGo - La marketplace de services et locations partout au Congo">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -12,531 +12,643 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="BamsGo-logo-transparent.png">
     <link rel="apple-touch-icon" href="BamsGo-logo-transparent.png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary: #E85D04;
-            --primary-dark: #DC2F02;
-            --primary-light: #F48C06;
-            --secondary: #0A9396;
-            --secondary-dark: #005F73;
-            --accent: #FBBF24;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --bg: #F8F9FA;
-            --card-bg: #FFFFFF;
-            --text-dark: #1A1A2E;
-            --text-medium: #6B7280;
-            --text-light: #9CA3AF;
-            --border: #E5E7EB;
+            /* Couleurs de marque */
+            --navy: #1E3A5F;
+            --navy-dark: #142943;
+            --navy-light: #2E5280;
+            --orange: #FF6B35;
+            --orange-dark: #E85A28;
+            --orange-light: #FFF1EC;
+
+            /* Neutres */
+            --cream: #FAFAF8;
+            --white: #FFFFFF;
+            --border: #E5E3DB;
+            --border-strong: #D3D1C7;
+            --text-dark: #1A1A1A;
+            --text-medium: #6B6862;
+            --text-light: #8A8880;
+
+            /* Sémantique */
+            --success: #3B6D11;
+            --success-bg: #EAF3DE;
+            --warning-bg: #FAEEDA;
+            --warning-text: #854F0B;
+            --danger: #C0392B;
+
+            /* Système */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 22px;
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overscroll-behavior-y: none;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
+            font-family: var(--font-body);
+            background: var(--navy);
             color: var(--text-dark);
-            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* App Container */
-        .app-container {
-            background: white;
+        .app-shell {
+            max-width: 480px;
+            margin: 0 auto;
             min-height: 100vh;
+            background: var(--cream);
             position: relative;
-            padding-bottom: 80px;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Status Bar - REMOVED */
+        .hidden { display: none !important; }
+
+        button, input, select, textarea {
+            font-family: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        img { max-width: 100%; display: block; }
+
+        /* ============ TYPOGRAPHIE ============ */
+        .font-display {
+            font-family: var(--font-display);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        /* ============ STATUS BAR (simulateur mobile, optionnel) ============ */
         .status-bar {
             display: none;
         }
 
-        /* App Header */
-        .app-header {
-            padding: 1rem 1.25rem;
-            background: white;
-            border-bottom: 1px solid var(--border);
+        /* ============ AUTH PAGE ============ */
+        #auth-page {
+            min-height: 100vh;
+            background: var(--navy);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .auth-hero {
+            padding: 48px 28px 32px;
+            text-align: center;
+        }
+
+        .auth-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .auth-logo span {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 30px;
+            color: var(--navy);
+        }
+
+        .auth-hero h1 {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .auth-hero p, #auth-subtitle {
+            font-size: 14px;
+            color: rgba(250,250,248,0.65);
+        }
+
+        .auth-card {
+            background: var(--cream);
+            border-radius: 28px 28px 0 0;
+            flex: 1;
+            padding: 32px 24px 40px;
+        }
+
+        .account-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .account-type-card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px 14px;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        .account-type-card.selected {
+            border-color: var(--orange);
+            background: var(--orange-light);
+        }
+
+        .account-type-card .icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 20px;
+        }
+
+        .account-type-card.selected .icon-wrap {
+            background: var(--orange);
+        }
+
+        .account-type-card .label {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .account-type-card .sublabel {
+            font-size: 11.5px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 7px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 13px 14px;
+            font-size: 14.5px;
+            color: var(--text-dark);
+            transition: border-color 0.15s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+        }
+
+        .form-textarea {
+            min-height: 90px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238A8880' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 38px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--orange);
+            color: var(--white);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.15s ease;
+        }
+
+        .btn-primary:active { opacity: 0.85; }
+
+        .btn-primary:disabled { opacity: 0.5; }
+
+        /* ============ MAIN APP HEADER ============ */
+        .main-header {
+            background: var(--navy);
+            padding: 18px 20px 26px;
+            position: relative;
         }
 
         .header-top {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            justify-content: space-between;
+            margin-bottom: 18px;
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
+        .brand-mark {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 8px;
+        }
+
+        .brand-mark .logo-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-mark .logo-circle span {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--navy);
+        }
+
+        .brand-mark .brand-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--cream);
+            letter-spacing: -0.02em;
         }
 
         .header-actions {
             display: flex;
-            gap: 0.5rem;
+            align-items: center;
+            gap: 8px;
         }
 
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: var(--bg);
-            border: none;
+        .city-pill {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .icon-btn:hover {
-            background: var(--border);
-        }
-
-        .icon-btn:active {
-            transform: scale(0.95);
-        }
-
-        .badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.65rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        /* User Info */
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            background: var(--bg);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .user-info:hover {
-            background: var(--border);
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .user-details {
-            flex: 1;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 0.9375rem;
-            color: var(--text-dark);
-        }
-
-        .user-type {
-            font-size: 0.75rem;
-            color: var(--text-medium);
-        }
-
-        .user-type-badge {
-            display: inline-block;
-            padding: 0.125rem 0.5rem;
-            background: var(--primary);
-            color: white;
-            border-radius: 4px;
-            font-size: 0.6875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .user-type-badge.client {
-            background: var(--secondary);
-        }
-
-        /* Desktop Actions */
-        .desktop-actions {
-            display: none;
-            gap: 0.75rem;
-        }
-
-        .btn-desktop {
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            border: none;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: 0.9375rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary-desktop {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary-desktop:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-secondary-desktop {
-            background: var(--bg);
-            color: var(--text-dark);
-        }
-
-        .btn-secondary-desktop:hover {
-            background: var(--border);
-        }
-
-        /* Location Badge */
-        .location-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--bg);
-            border-radius: 50px;
-            width: fit-content;
-            font-size: 0.875rem;
+            gap: 5px;
+            background: rgba(255,255,255,0.12);
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--cream);
             font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
             position: relative;
         }
 
-        .location-badge:hover {
-            background: var(--border);
+        .icon-btn-header {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: var(--cream);
         }
 
-        .city-selector {
-            position: relative;
-            display: inline-block;
+        .icon-btn-header .badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: var(--orange);
+            color: var(--white);
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--cream);
+            line-height: 1.3;
+            letter-spacing: -0.01em;
         }
 
         .city-dropdown {
             display: none;
             position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 0.5rem;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            min-width: 250px;
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 1000;
-            animation: slideDown 0.3s ease;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 24px rgba(20,41,67,0.2);
+            overflow: hidden;
+            z-index: 50;
+            min-width: 220px;
+            text-align: left;
         }
 
-        .city-dropdown.active {
-            display: block;
-        }
+        .city-dropdown.active { display: block; }
 
         .city-dropdown-item {
-            padding: 1rem 1.25rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+            border-bottom: 0.5px solid var(--border);
         }
 
-        .city-dropdown-item:last-child {
-            border-bottom: none;
-        }
+        .city-dropdown-item:last-child { border-bottom: none; }
 
-        .city-dropdown-item:hover {
-            background: var(--bg);
-        }
-
-        .city-dropdown-item.active {
-            background: rgba(232, 93, 4, 0.1);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .city-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
+        .city-dropdown-item.active { background: var(--orange-light); }
 
         .city-name {
+            font-size: 13px;
             font-weight: 600;
-            font-size: 0.9375rem;
+            color: var(--text-dark);
         }
 
         .city-status {
-            font-size: 0.75rem;
+            font-size: 11px;
             color: var(--text-light);
+            margin-top: 1px;
         }
 
-        .city-status.active {
-            color: var(--success);
-        }
+        .city-status.active { color: var(--success); }
 
         .city-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.6875rem;
+            font-size: 9.5px;
             font-weight: 700;
-            text-transform: uppercase;
+            padding: 3px 7px;
+            border-radius: 6px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
         }
 
         .city-badge.active {
-            background: var(--success);
-            color: white;
+            background: var(--success-bg);
+            color: var(--success);
         }
 
         .city-badge.soon {
-            background: var(--accent);
-            color: var(--text-dark);
+            background: var(--border);
+            color: var(--text-light);
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* ============ SEARCH BAR ============ */
+        .search-bar-wrap {
+            padding: 16px 20px 0;
         }
 
-        /* Tabs */
-        .tabs-container {
-            padding: 1rem 1.25rem;
-            background: white;
-            border-bottom: 1px solid var(--border);
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 11px 14px;
+            color: var(--text-light);
         }
 
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            background: var(--bg);
-            padding: 0.375rem;
-            border-radius: 12px;
+        .search-bar span { font-size: 13.5px; }
+
+        /* ============ TABS ============ */
+        .tabs-row {
+            display: flex;
+            gap: 8px;
+            padding: 18px 20px 4px;
         }
 
         .tab {
-            padding: 0.75rem;
-            border: none;
-            background: transparent;
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
             border-radius: 10px;
-            font-family: 'Outfit', sans-serif;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            font-size: 13.5px;
             font-weight: 600;
-            font-size: 0.9375rem;
             color: var(--text-medium);
-            cursor: pointer;
-            transition: all 0.2s;
         }
 
         .tab.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            background: var(--navy);
+            border-color: var(--navy);
+            color: var(--cream);
         }
 
-        /* Content */
-        .content {
-            padding: 1rem 1.25rem 1rem;
-            background: var(--bg);
-            min-height: calc(100vh - 400px);
-        }
-
-        /* Section Header */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .section-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .see-all {
-            font-size: 0.875rem;
-            color: var(--primary);
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .see-all:hover {
-            text-decoration: underline;
-        }
-
-        /* Categories Scroll */
+        /* ============ CATEGORIES GRID ============ */
         .categories-scroll {
-            display: flex;
-            gap: 0.75rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .categories-scroll::-webkit-scrollbar {
-            display: none;
+            padding: 16px 20px 100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         .category-chip {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            min-width: 80px;
-            padding: 1rem 0.75rem;
-            background: white;
-            border-radius: 16px;
-            border: 2px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 16px 14px;
+            transition: transform 0.1s ease;
         }
 
-        .category-chip:hover {
-            border-color: var(--primary-light);
-            transform: translateY(-2px);
-        }
+        .category-chip:active { transform: scale(0.97); }
 
-        .category-chip:active {
-            transform: scale(0.95);
-        }
-
-        .category-chip.active {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, rgba(232, 93, 4, 0.05), rgba(232, 93, 4, 0.1));
-        }
-
-        .category-chip-icon {
-            font-size: 2rem;
-        }
-
-        .category-chip-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        /* Listings */
-        .listings-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .listing-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .listing-card:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            transform: translateY(-4px);
-        }
-
-        .listing-card:active {
-            transform: scale(0.98);
-        }
-
-        .listing-image {
-            height: 140px;
-            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+        .category-chip .cat-icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5rem;
+            margin-bottom: 12px;
+            font-size: 19px;
+        }
+
+        .category-chip .cat-label {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: left;
+            line-height: 1.3;
+        }
+
+        /* Palette de familles de catégories */
+        .cat-depannage { background: #FDEDE6; color: #D85A30; }
+        .cat-auto { background: #E6F1FB; color: #185FA5; }
+        .cat-btp { background: #EAF3DE; color: #3B6D11; }
+        .cat-beaute { background: #FBEAF0; color: #993556; }
+        .cat-maison { background: #FAEEDA; color: #854F0B; }
+        .cat-energie { background: #EEEDFE; color: #534AB7; }
+        .cat-evenement { background: #FBEAF0; color: #993556; }
+        .cat-vehicules { background: #E6F1FB; color: #185FA5; }
+
+        /* ============ LISTINGS VIEW ============ */
+        .listings-header-bar {
+            padding: 16px 20px 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 20px 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .filter-bar::-webkit-scrollbar { display: none; }
+
+        .filter-chip {
+            flex-shrink: 0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-medium);
+            white-space: nowrap;
+        }
+
+        .filter-chip.active {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: var(--cream);
+        }
+
+        .listings-grid {
+            padding: 14px 20px 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .listing-card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .listing-image {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
             position: relative;
         }
 
         .listing-badge {
             position: absolute;
-            top: 0.75rem;
-            left: 0.75rem;
-            padding: 0.375rem 0.75rem;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
-            font-size: 0.6875rem;
+            bottom: -3px;
+            right: -20px;
+            background: var(--text-light);
+            color: var(--white);
+            font-size: 8.5px;
             font-weight: 700;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
         }
 
-        .listing-content {
-            padding: 1rem;
-        }
+        .listing-content { flex: 1; min-width: 0; }
 
         .listing-title {
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 14.5px;
+            font-weight: 600;
             color: var(--text-dark);
-            margin-bottom: 0.375rem;
+            margin-bottom: 3px;
         }
 
         .listing-meta {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
+            gap: 6px;
             flex-wrap: wrap;
+            margin-bottom: 6px;
         }
 
         .listing-location {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
-            font-size: 0.8125rem;
+            gap: 3px;
+            font-size: 11.5px;
             color: var(--text-medium);
         }
 
@@ -544,19 +656,40 @@
             width: 3px;
             height: 3px;
             border-radius: 50%;
-            background: var(--text-light);
+            background: var(--border-strong);
         }
 
         .listing-type {
-            font-size: 0.8125rem;
+            font-size: 11.5px;
             color: var(--text-medium);
         }
 
+        .rating-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--warning-bg);
+            padding: 3px 8px;
+            border-radius: 7px;
+            margin-bottom: 8px;
+        }
+
+        .rating-stars { font-size: 10px; color: var(--warning-text); }
+        .rating-value { font-size: 11.5px; font-weight: 600; color: #412402; }
+        .rating-count { font-size: 11px; color: var(--warning-text); }
+
+        .top-badge {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--orange-dark);
+            margin-left: 4px;
+        }
+
         .listing-description {
-            font-size: 0.875rem;
+            font-size: 12.5px;
             color: var(--text-medium);
             line-height: 1.5;
-            margin-bottom: 1rem;
+            margin-bottom: 10px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -565,1372 +698,776 @@
 
         .listing-footer {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border);
+            justify-content: space-between;
         }
 
         .listing-price {
-            font-size: 1.125rem;
+            font-size: 13.5px;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--text-dark);
         }
 
         .btn-contact {
-            padding: 0.625rem 1.25rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: 0.875rem;
-            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.375rem;
-            transition: all 0.2s;
-            text-decoration: none;
+            gap: 6px;
+            background: var(--orange);
+            color: var(--white);
+            padding: 8px 14px;
+            border-radius: 9px;
+            font-size: 12.5px;
+            font-weight: 600;
         }
 
-        .btn-contact:hover {
-            background: var(--primary-dark);
-            transform: scale(1.05);
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
         }
 
-        .btn-contact:active {
-            transform: scale(0.95);
+        .empty-state-icon {
+            font-size: 40px;
+            color: var(--border-strong);
+            margin-bottom: 14px;
         }
 
-        /* Bottom Navigation - TOUJOURS VISIBLE */
+        .empty-state h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* ============ BOTTOM NAV ============ */
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: var(--white);
             border-top: 1px solid var(--border);
-            padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.25rem;
-            z-index: 100;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+            z-index: 40;
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.5rem 0.25rem;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            border-radius: 12px;
-            transition: all 0.2s;
+            gap: 3px;
+            color: var(--border-strong);
+            padding: 4px 8px;
         }
 
-        .nav-item:hover {
-            background: var(--bg);
+        .nav-item.active { color: var(--navy); }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 500;
         }
 
-        .nav-item:active {
-            transform: scale(0.95);
-        }
+        .nav-item .icon { font-size: 21px; }
 
-        .nav-item.active {
-            background: rgba(232, 93, 4, 0.08);
-        }
-
-        .nav-icon {
-            font-size: 1.5rem;
-        }
-
-        .nav-item.active .nav-icon {
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: var(--text-medium);
-        }
-
-        .nav-item.active .nav-label {
-            color: var(--primary);
-        }
-
-        /* FAB Button */
-        .fab {
-            position: fixed;
-            bottom: calc(5rem + env(safe-area-inset-bottom));
-            right: 1.25rem;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
+        .nav-post-btn {
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            color: white;
-            font-size: 1.75rem;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(232, 93, 4, 0.4);
-            z-index: 99;
-            transition: all 0.2s;
+            background: var(--orange);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-top: -26px;
+            color: var(--white);
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(255,107,53,0.35);
         }
 
-        .fab:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 32px rgba(232, 93, 4, 0.5);
-        }
-
-        .fab:active {
-            transform: scale(0.9);
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            display: none;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .modal-overlay.active {
-            display: block;
-        }
-
-        .modal {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            border-radius: 24px 24px 0 0;
-            max-height: 90vh;
-            overflow-y: auto;
-            z-index: 1001;
-            display: none;
-            animation: slideUp 0.3s ease;
-        }
-
-        .modal.active {
-            display: block;
-        }
-
-        .modal-header {
-            padding: 1.5rem 1.25rem 1rem;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-        }
-
-        .modal-handle {
-            width: 40px;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            margin: 0 auto 1rem;
-        }
-
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .modal-body {
-            padding: 1.25rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-required {
-            color: var(--primary);
-        }
-
-        .form-input,
-        .form-select,
-        .form-textarea {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            background: var(--bg);
-            border: 2px solid transparent;
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.9375rem;
-            color: var(--text-dark);
-            transition: all 0.2s;
-        }
-
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(232, 93, 4, 0.3);
-        }
-
-        .btn-submit:active {
-            transform: scale(0.98);
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.4;
-        }
-
-        .empty-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-text {
-            font-size: 0.9375rem;
-            color: var(--text-medium);
-        }
-
-        /* Filter Bar */
-        .filter-bar {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .filter-bar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .filter-chip {
-            padding: 0.5rem 1rem;
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-medium);
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-chip:hover {
-            border-color: var(--primary-light);
-        }
-
-        .filter-chip:active {
-            transform: scale(0.95);
-        }
-
-        .filter-chip.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* Login/Account Pages */
-        .auth-container {
-            max-width: 400px;
-            margin: 2rem auto;
-            padding: 2rem 1.25rem;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-header h1 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-header p {
-            color: var(--text-medium);
-        }
-
-        .account-type-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .account-type-card {
-            padding: 1.5rem;
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .account-type-card:hover {
-            border-color: var(--primary-light);
-        }
-
-        .account-type-card.selected {
-            border-color: var(--primary);
-            background: rgba(232, 93, 4, 0.05);
-        }
-
-        .account-type-icon {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .account-type-title {
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .account-type-desc {
-            font-size: 0.75rem;
-            color: var(--text-medium);
-        }
-
-        .btn-link {
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* Account Page */
+        /* ============ ACCOUNT PAGE ============ */
         .account-page {
-            padding-bottom: 1rem;
+            padding: 20px 20px 100px;
         }
 
-        .account-stats {
+        .account-header-card {
+            background: var(--navy);
+            border-radius: var(--radius-xl);
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .user-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--navy);
+            flex-shrink: 0;
+        }
+
+        .user-name {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 4px;
+        }
+
+        .user-type-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            color: var(--cream);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
-            background: white;
-            padding: 1rem;
-            border-radius: 12px;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 8px;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.25rem;
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--navy);
         }
 
         .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-medium);
-        }
-
-        .menu-list {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .menu-item {
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .menu-item:hover {
-            background: var(--bg);
-        }
-
-        .menu-item:active {
-            transform: scale(0.98);
-        }
-
-        .menu-icon {
-            font-size: 1.5rem;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg);
-            border-radius: 10px;
-        }
-
-        .menu-content {
-            flex: 1;
-        }
-
-        .menu-title {
-            font-weight: 600;
-            margin-bottom: 0.125rem;
-        }
-
-        .menu-subtitle {
-            font-size: 0.8125rem;
-            color: var(--text-medium);
-        }
-
-        .menu-arrow {
+            font-size: 10.5px;
             color: var(--text-light);
+            margin-top: 2px;
         }
 
-        .btn-logout {
-            width: 100%;
-            padding: 1rem;
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 1.5rem;
+        .account-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translate(-50%, 100%); }
-            to { transform: translate(-50%, 0); }
-        }
-
-        /* Desktop Responsive */
-        @media (min-width: 768px) {
-            .content {
-                padding: 2rem;
-            }
-
-            .listings-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-            }
-
-            .categories-scroll {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                overflow-x: visible;
-            }
-
-            .category-chip {
-                min-width: auto;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            body {
-                background: #E5E7EB;
-            }
-
-            .app-container {
-                max-width: 1400px;
-                margin: 0 auto;
-                box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
-            }
-
-            .status-bar {
-                display: none;
-            }
-
-            .bottom-nav {
-                display: none;
-            }
-
-            .fab {
-                display: none;
-            }
-
-            .desktop-actions {
-                display: flex;
-            }
-
-            .app-header {
-                padding: 1.5rem 3rem;
-            }
-
-            .header-top {
-                margin-bottom: 1.5rem;
-            }
-
-            .logo {
-                font-size: 2rem;
-            }
-
-            .tabs-container {
-                padding: 1.5rem 3rem;
-            }
-
-            .tabs {
-                max-width: 400px;
-            }
-
-            .content {
-                padding: 2rem 3rem 3rem;
-            }
-
-            .listings-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 2rem;
-            }
-
-            .section-header {
-                margin-bottom: 1.5rem;
-            }
-
-            .section-title {
-                font-size: 1.5rem;
-            }
-
-            .categories-scroll {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 1rem;
-            }
-
-            .category-chip {
-                padding: 1.5rem 1rem;
-            }
-
-            .modal {
-                top: 50%;
-                bottom: auto;
-                transform: translate(-50%, -50%);
-                border-radius: 24px;
-                max-width: 600px;
-            }
-
-            .modal.active {
-                animation: scaleIn 0.3s ease;
-            }
-
-            @keyframes scaleIn {
-                from {
-                    transform: translate(-50%, -50%) scale(0.9);
-                    opacity: 0;
-                }
-                to {
-                    transform: translate(-50%, -50%) scale(1);
-                    opacity: 1;
-                }
-            }
-
-            .modal-handle {
-                display: none;
-            }
-        }
-
-        @media (min-width: 1440px) {
-            .listings-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        /* Hide elements initially */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Rating System Styles */
-        .rating-display {
+        .account-menu-item {
             display: flex;
             align-items: center;
-            gap: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .rating-stars {
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-        }
-
-        .rating-value {
+            gap: 12px;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            font-size: 13.5px;
+            font-weight: 500;
             color: var(--text-dark);
         }
 
-        .rating-count {
-            color: var(--text-light);
-            font-weight: 500;
-        }
-
-        .top-badge {
-            display: inline-flex;
+        .account-menu-item .menu-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: var(--orange-light);
+            color: var(--orange-dark);
+            display: flex;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.5rem;
-            background: linear-gradient(135deg, var(--accent), var(--warning));
-            color: white;
-            border-radius: 6px;
-            font-size: 0.6875rem;
-            font-weight: 700;
-            margin-left: 0.5rem;
+            justify-content: center;
+            font-size: 16px;
         }
 
-        /* Rating Modal */
-        .rating-modal {
+        .account-menu-item.danger { color: var(--danger); }
+        .account-menu-item.danger .menu-icon { background: #FCEBEB; color: var(--danger); }
+
+        /* ============ MODALS ============ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(20,41,67,0.55);
+            z-index: 90;
+        }
+
+        .modal-overlay.active { display: block; }
+
+        .modal {
+            display: none;
             position: fixed;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            max-width: 600px;
-            background: white;
+            max-width: 480px;
+            max-height: 88vh;
+            background: var(--cream);
             border-radius: 24px 24px 0 0;
-            max-height: 85vh;
+            z-index: 100;
             overflow-y: auto;
-            z-index: 1002;
-            display: none;
-            animation: slideUp 0.3s ease;
         }
 
-        .rating-modal.active {
-            display: block;
-        }
+        .modal.active { display: block; }
 
-        .rating-modal-header {
-            padding: 1.5rem 1.25rem 1rem;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-        }
-
-        .rating-modal-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .rating-modal-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-medium);
-        }
-
-        .rating-modal-body {
-            padding: 1.25rem;
-        }
-
-        .rating-criteria {
-            margin-bottom: 1.5rem;
-        }
-
-        .rating-criterion {
-            margin-bottom: 1.5rem;
-        }
-
-        .criterion-label {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.75rem;
-            display: block;
-        }
-
-        .star-rating {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-        }
-
-        .star {
-            font-size: 2.5rem;
-            color: var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-
-        .star:hover,
-        .star.active {
-            color: var(--accent);
-            transform: scale(1.1);
-        }
-
-        .star:active {
-            transform: scale(0.95);
-        }
-
-        .rating-comment {
-            margin-bottom: 1rem;
-        }
-
-        .comment-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .comment-textarea {
-            width: 100%;
-            min-height: 80px;
-            padding: 0.875rem;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.9375rem;
-            resize: vertical;
-            transition: all 0.2s;
-        }
-
-        .comment-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .comment-counter {
-            text-align: right;
-            font-size: 0.75rem;
-            color: var(--text-light);
-            margin-top: 0.25rem;
-        }
-
-        .quick-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
-        .quick-tag {
-            padding: 0.5rem 1rem;
-            background: var(--bg);
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: var(--text-medium);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .quick-tag:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .quick-tag:active {
-            transform: scale(0.95);
-        }
-
-        .quick-tag.selected {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .btn-submit-rating {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 1rem;
-        }
-
-        .btn-submit-rating:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(232, 93, 4, 0.3);
-        }
-
-        .btn-submit-rating:active {
-            transform: scale(0.98);
-        }
-
-        .btn-submit-rating:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .rating-success {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .success-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .success-text {
-            font-size: 0.9375rem;
-            color: var(--text-medium);
-        }
-
-        /* Desktop Rating Modal */
-        @media (min-width: 1024px) {
-            .rating-modal {
-                top: 50%;
-                bottom: auto;
-                transform: translate(-50%, -50%);
-                border-radius: 24px;
-                max-width: 600px;
-            }
-
-            .rating-modal.active {
-                animation: scaleIn 0.3s ease;
-            }
-        }
-
-        /* Notifications Panel */
-        .notifications-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            max-width: 400px;
-            height: 100vh;
-            background: white;
-            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
-            z-index: 1003;
-            transition: right 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .notifications-panel.active {
-            right: 0;
-        }
-
-        .notifications-header {
-            padding: 1.5rem 1.25rem;
-            border-bottom: 2px solid var(--border);
+        .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: white;
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--border);
+            background: var(--white);
             position: sticky;
             top: 0;
-            z-index: 10;
         }
 
-        .notifications-title {
-            font-size: 1.25rem;
-            font-weight: 700;
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 600;
             color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
-        .notification-count {
-            background: var(--primary);
-            color: white;
-            padding: 0.125rem 0.5rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .btn-close-notifications {
-            width: 36px;
-            height: 36px;
+        .modal-close {
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            background: var(--bg);
-            border: none;
+            background: var(--cream);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            font-size: 1.25rem;
-            transition: all 0.2s;
+            color: var(--text-medium);
         }
 
-        .btn-close-notifications:hover {
-            background: var(--border);
+        .modal-body { padding: 20px; }
+
+        .type-toggle-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
-        .notifications-body {
+        .type-toggle {
             flex: 1;
-            overflow-y: auto;
-            padding: 1rem 0;
+            text-align: center;
+            padding: 11px 0;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-medium);
         }
+
+        .type-toggle.active {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: var(--cream);
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* ============ NOTIFICATIONS PANEL ============ */
+        .notifications-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: var(--cream);
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .notifications-panel.active { display: block; }
+
+        .notifications-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+
+        .notifications-header h2 {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .notification-count {
+            background: var(--orange);
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .notifications-body { padding: 12px 16px; }
 
         .notification-item {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
             display: flex;
-            gap: 1rem;
+            gap: 12px;
+            padding: 14px 12px;
+            border-radius: var(--radius-md);
+            position: relative;
         }
 
-        .notification-item:hover {
-            background: var(--bg);
-        }
-
-        .notification-item.unread {
-            background: rgba(232, 93, 4, 0.05);
-        }
+        .notification-item.unread { background: var(--white); }
 
         .notification-icon {
-            font-size: 1.75rem;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--orange-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
             flex-shrink: 0;
         }
 
-        .notification-content {
-            flex: 1;
+        .notification-content { flex: 1; min-width: 0; }
+
+        .city-info { display: flex; flex-direction: column; gap: 1px; }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .star {
+            font-size: 30px;
+            color: var(--border-strong);
+            cursor: pointer;
+            line-height: 1;
         }
 
         .notification-title {
-            font-weight: 700;
-            font-size: 0.9375rem;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-dark);
-            margin-bottom: 0.25rem;
+            margin-bottom: 2px;
         }
 
         .notification-message {
-            font-size: 0.875rem;
+            font-size: 12.5px;
             color: var(--text-medium);
-            margin-bottom: 0.5rem;
             line-height: 1.4;
         }
 
         .notification-time {
-            font-size: 0.75rem;
+            font-size: 11px;
             color: var(--text-light);
+            margin-top: 4px;
         }
 
         .notification-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background: var(--primary);
+            background: var(--orange);
             flex-shrink: 0;
-            margin-top: 0.5rem;
+            margin-top: 6px;
         }
 
         .empty-notifications {
-            padding: 3rem 1.25rem;
             text-align: center;
+            padding: 60px 24px;
         }
 
         .empty-notifications-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
+            font-size: 36px;
+            color: var(--border-strong);
+            margin-bottom: 12px;
         }
 
         .empty-notifications-text {
-            color: var(--text-medium);
-            font-size: 0.9375rem;
+            font-size: 13px;
+            color: var(--text-light);
         }
 
-        .notifications-footer {
-            padding: 1rem 1.25rem;
-            border-top: 2px solid var(--border);
-            background: white;
-        }
-
-        .btn-mark-all-read {
-            width: 100%;
-            padding: 0.875rem;
-            background: var(--bg);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: 0.9375rem;
-            color: var(--text-dark);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-mark-all-read:hover {
-            background: var(--border);
-        }
-
-        .btn-mark-all-read:active {
-            transform: scale(0.98);
-        }
-
-        @media (min-width: 768px) {
-            .notifications-panel {
-                max-width: 420px;
-            }
-        }
-
-        /* Reviews Detail Modal */
+        /* ============ REVIEWS MODAL ============ */
         .reviews-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: white;
-            z-index: 1004;
             display: none;
-            flex-direction: column;
-            overflow: hidden;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            background: var(--cream);
+            border-radius: 24px 24px 0 0;
+            z-index: 100;
+            overflow-y: auto;
         }
 
-        .reviews-modal.active {
-            display: flex;
-        }
+        .reviews-modal.active { display: block; }
 
         .reviews-modal-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 2px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 1rem;
-            background: white;
+            justify-content: space-between;
+            padding: 18px 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            z-index: 10;
-        }
-
-        .btn-back-reviews {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--bg);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.25rem;
-            transition: all 0.2s;
-        }
-
-        .btn-back-reviews:hover {
-            background: var(--border);
         }
 
         .reviews-modal-title {
-            flex: 1;
-            font-size: 1.125rem;
-            font-weight: 700;
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 600;
         }
 
-        .reviews-modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.25rem;
-        }
+        .reviews-modal-body { padding: 20px; }
 
         .reviews-summary {
-            background: var(--bg);
-            padding: 1.5rem;
-            border-radius: 16px;
             text-align: center;
-            margin-bottom: 1.5rem;
+            padding: 12px 0 24px;
         }
 
         .reviews-overall-rating {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
+            font-family: var(--font-display);
+            font-size: 40px;
+            font-weight: 600;
+            color: var(--navy);
         }
 
         .reviews-overall-stars {
-            font-size: 1.5rem;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
+            color: var(--warning-text);
+            font-size: 16px;
+            margin: 6px 0;
         }
 
         .reviews-overall-count {
-            font-size: 0.875rem;
-            color: var(--text-medium);
+            font-size: 12.5px;
+            color: var(--text-light);
         }
 
         .reviews-criteria {
-            margin-bottom: 2rem;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 20px;
         }
 
         .reviews-criteria-title {
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-dark);
-            margin-bottom: 1rem;
+            margin-bottom: 12px;
         }
 
         .criteria-item {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
+        .criteria-item:last-child { margin-bottom: 0; }
+
         .criteria-label {
-            flex: 1;
-            font-size: 0.875rem;
+            font-size: 12px;
             color: var(--text-medium);
+            width: 100px;
+            flex-shrink: 0;
         }
 
         .criteria-bar-container {
-            flex: 2;
-            height: 8px;
+            flex: 1;
+            height: 6px;
             background: var(--border);
-            border-radius: 50px;
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .criteria-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--warning));
-            border-radius: 50px;
-            transition: width 0.3s ease;
+            background: var(--orange);
+            border-radius: 3px;
         }
 
         .criteria-value {
-            width: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            width: 24px;
             text-align: right;
-            font-weight: 700;
-            font-size: 0.875rem;
-            color: var(--text-dark);
-        }
-
-        .reviews-list-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
         }
 
         .review-item {
-            padding: 1.25rem;
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
         }
 
         .review-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.75rem;
+            margin-bottom: 6px;
         }
 
         .review-user {
-            font-weight: 700;
-            font-size: 0.9375rem;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-dark);
         }
 
         .review-rating {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 4px;
         }
 
-        .review-stars {
-            color: var(--accent);
-            font-size: 1rem;
-        }
-
-        .review-value {
-            font-weight: 700;
-            font-size: 0.875rem;
-            color: var(--text-dark);
-        }
+        .review-stars { color: var(--warning-text); font-size: 11px; }
+        .review-value { font-size: 12px; font-weight: 600; }
 
         .review-comment {
-            font-size: 0.9375rem;
-            color: var(--text-dark);
+            font-size: 12.5px;
+            color: var(--text-medium);
             line-height: 1.5;
-            margin-bottom: 0.75rem;
+            margin-bottom: 8px;
         }
 
         .review-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
+            gap: 6px;
+            margin-bottom: 6px;
         }
 
         .review-tag {
-            padding: 0.375rem 0.75rem;
-            background: rgba(232, 93, 4, 0.1);
-            color: var(--primary);
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 10.5px;
+            font-weight: 500;
+            background: var(--success-bg);
+            color: var(--success);
+            padding: 3px 9px;
+            border-radius: 8px;
         }
 
         .review-date {
-            font-size: 0.75rem;
+            font-size: 11px;
             color: var(--text-light);
         }
 
         .no-reviews {
             text-align: center;
-            padding: 3rem 1rem;
+            padding: 50px 24px;
         }
 
         .no-reviews-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
+            font-size: 36px;
+            color: var(--border-strong);
+            margin-bottom: 12px;
         }
 
         .no-reviews-text {
-            font-size: 0.9375rem;
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* ============ RATING MODAL ============ */
+        .rating-modal {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            background: var(--cream);
+            border-radius: 24px 24px 0 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .rating-modal.active { display: block; }
+
+        .rating-modal-header {
+            padding: 22px 20px 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .rating-modal-title {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .rating-modal-subtitle {
+            font-size: 12.5px;
+            color: var(--text-light);
+        }
+
+        .rating-modal-body { padding: 20px; }
+
+        .rating-criterion {
+            margin-bottom: 20px;
+        }
+
+        .criterion-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 6px;
+        }
+
+        .star-rating span {
+            font-size: 28px;
+            color: var(--border-strong);
+        }
+
+        .quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 6px 0 18px;
+        }
+
+        .quick-tag {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 7px 13px;
+            border-radius: 16px;
+            border: 1.5px solid var(--border);
+            background: var(--white);
             color: var(--text-medium);
         }
 
-        @media (min-width: 768px) {
-            .reviews-modal {
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                width: 90%;
-                max-width: 700px;
-                height: 85vh;
-                border-radius: 24px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            }
+        .quick-tag.selected {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: var(--cream);
+        }
 
-            .reviews-modal-header {
-                border-radius: 24px 24px 0 0;
-            }
+        .comment-counter {
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .btn-submit-rating {
+            width: 100%;
+            background: var(--orange);
+            color: var(--white);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            font-size: 14.5px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .rating-success {
+            text-align: center;
+            padding: 50px 24px;
+        }
+
+        .success-icon {
+            font-size: 44px;
+            color: var(--success);
+            margin-bottom: 14px;
+        }
+
+        .success-title {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .success-text {
+            font-size: 13px;
+            color: var(--text-medium);
+            line-height: 1.5;
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="status-time" id="current-time">9:41</div>
-            <div class="status-icons">
-                <span>📶</span>
-                <span>📡</span>
-                <span>🔋</span>
-            </div>
-        </div>
+    <div class="app-shell">
 
-        <!-- Login/Register Page -->
+        <!-- Auth Page -->
         <div id="auth-page" class="hidden">
-            <div class="auth-container">
-                <div class="auth-header">
-                    <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
-                        <img src="BamsGo-horizontal.png" alt="BamsGo" style="height: 60px;">
-                    </div>
-                    <h1>Bienvenue !</h1>
-                    <p id="auth-subtitle">Choisissez votre type de compte</p>
-                </div>
-
+            <div class="auth-hero">
+                <div class="auth-logo"><span>B</span></div>
+                <h1>Bienvenue sur BamsGo</h1>
+                <p id="auth-subtitle">Choisissez votre type de compte</p>
+            </div>
+            <div class="auth-card">
                 <div class="account-type-selector" id="account-type-selector">
                     <div class="account-type-card" data-type="client" onclick="selectAccountType('client')">
-                        <div class="account-type-icon">👤</div>
-                        <div class="account-type-title">Client</div>
-                        <div class="account-type-desc">Trouver des services</div>
+                        <div class="icon-wrap"><i class="ti ti-user" style="color:var(--cream);" aria-hidden="true"></i></div>
+                        <div class="label">Client</div>
+                        <div class="sublabel">Trouver des services</div>
                     </div>
                     <div class="account-type-card" data-type="prestataire" onclick="selectAccountType('prestataire')">
-                        <div class="account-type-icon">💼</div>
-                        <div class="account-type-title">Prestataire</div>
-                        <div class="account-type-desc">Proposer mes services</div>
+                        <div class="icon-wrap"><i class="ti ti-briefcase" style="color:var(--cream);" aria-hidden="true"></i></div>
+                        <div class="label">Prestataire</div>
+                        <div class="sublabel">Proposer mes services</div>
                     </div>
                 </div>
 
                 <form id="auth-form">
                     <div class="form-group">
-                        <label class="form-label">Nom complet <span class="form-required">*</span></label>
+                        <label class="form-label">Nom complet</label>
                         <input type="text" class="form-input" id="auth-name" required placeholder="Ex: Jean Kabamba">
                     </div>
-
                     <div class="form-group">
-                        <label class="form-label">Numéro de téléphone <span class="form-required">*</span></label>
+                        <label class="form-label">Numéro de téléphone</label>
                         <input type="tel" class="form-input" id="auth-phone" required placeholder="+243 XXX XXX XXX">
                     </div>
-
                     <div class="form-group" id="prestataire-fields" style="display: none;">
-                        <label class="form-label">Spécialité <span class="form-required">*</span></label>
+                        <label class="form-label">Spécialité</label>
                         <select class="form-select" id="auth-specialty">
                             <option value="">Sélectionnez votre spécialité</option>
                             <option value="depannage">Dépannage & Urgences</option>
@@ -1940,211 +1477,150 @@
                             <option value="maison">Services à domicile</option>
                         </select>
                     </div>
-
-                    <button type="submit" class="btn-submit">Créer mon compte</button>
+                    <button type="submit" class="btn-primary">Créer mon compte</button>
                 </form>
             </div>
         </div>
 
-        <!-- Main App (Hidden until logged in) -->
+        <!-- Main App -->
         <div id="main-app" class="hidden">
-            <!-- App Header -->
-            <div class="app-header">
+
+            <div class="main-header">
                 <div class="header-top">
-                    <div class="logo">
-                        <img src="BamsGo-horizontal.png" alt="BamsGo" style="height: 36px;">
+                    <div class="brand-mark">
+                        <div class="logo-circle"><span>B</span></div>
+                        <span class="brand-name">BamsGo</span>
                     </div>
                     <div class="header-actions">
-                        <!-- Mobile Actions -->
-                        <button class="icon-btn" onclick="showNotifications()">
-                            🔔
+                        <div class="city-pill" onclick="toggleCityDropdown()" style="cursor:pointer;">
+                            <i class="ti ti-map-pin" style="font-size:13px;" aria-hidden="true"></i>
+                            <span id="current-city">Kolwezi</span>
+                            <i class="ti ti-chevron-down" style="font-size:12px;" aria-hidden="true"></i>
+                            <div class="city-dropdown" id="city-dropdown"></div>
+                        </div>
+                        <button class="icon-btn-header" onclick="showNotifications()" aria-label="Notifications">
+                            <i class="ti ti-bell" style="font-size:17px;" aria-hidden="true"></i>
                             <span class="badge">3</span>
                         </button>
-                        <button class="icon-btn" onclick="showAccountPage()">👤</button>
-                        
-                        <!-- Desktop Actions -->
-                        <div class="desktop-actions">
-                            <button class="btn-desktop btn-secondary-desktop" onclick="showNotifications()">
-                                <span>🔔</span>
-                                <span>Notifications</span>
-                            </button>
-                            <button class="btn-desktop btn-secondary-desktop" onclick="showAccountPage()">
-                                <span>👤</span>
-                                <span>Mon compte</span>
-                            </button>
-                            <button class="btn-desktop btn-primary-desktop" onclick="openPostModal('service')">
-                                <span>➕</span>
-                                <span>Publier une annonce</span>
-                            </button>
-                        </div>
+                        <button class="icon-btn-header" onclick="showAccountPage()" aria-label="Mon compte">
+                            <i class="ti ti-user" style="font-size:17px;" aria-hidden="true"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="city-selector">
-                    <div class="location-badge" onclick="toggleCityDropdown()">
-                        <span>📍</span>
-                        <span id="current-city">Kolwezi</span>
-                        <span>▼</span>
-                    </div>
-                    <div class="city-dropdown" id="city-dropdown">
-                        <!-- Cities loaded here -->
-                    </div>
+                <p class="header-title font-display">Trouvez un pro<br>de confiance</p>
+            </div>
+
+            <div class="search-bar-wrap">
+                <div class="search-bar" onclick="showSearch()" style="cursor:pointer;">
+                    <i class="ti ti-search" style="font-size:16px;" aria-hidden="true"></i>
+                    <span>Rechercher un service...</span>
                 </div>
             </div>
 
-            <!-- Tabs -->
-            <div class="tabs-container">
-                <div class="tabs">
-                    <button class="tab active" onclick="switchTab('services')" id="tab-services">
-                        🔧 Services
+            <div class="tabs-row">
+                <button class="tab active" onclick="switchTab('services')" id="tab-services">Services</button>
+                <button class="tab" onclick="switchTab('location')" id="tab-location">Location</button>
+            </div>
+
+            <div id="categories-view">
+                <div class="categories-scroll" id="categories-scroll"></div>
+            </div>
+
+            <div id="listings-view" style="display: none;">
+                <div class="listings-header-bar">
+                    <button class="back-btn" onclick="showCategories()" aria-label="Retour">
+                        <i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i>
                     </button>
-                    <button class="tab" onclick="switchTab('location')" id="tab-location">
-                        🪑 Location
+                    <h2 class="section-title" id="listings-title">Annonces récentes</h2>
+                </div>
+                <div class="filter-bar" id="filter-bar">
+                    <button class="filter-chip active" onclick="filterQuartier('')">Tous</button>
+                    <button class="filter-chip" onclick="filterQuartier('Manika')">Manika</button>
+                    <button class="filter-chip" onclick="filterQuartier('Dilala')">Dilala</button>
+                    <button class="filter-chip" onclick="filterQuartier('Musonoi')">Musonoi</button>
+                    <button class="filter-chip" onclick="filterQuartier('Gécamines')">Gécamines</button>
+                </div>
+                <div class="listings-grid" id="listings-grid"></div>
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <div class="empty-state-icon"><i class="ti ti-inbox" aria-hidden="true"></i></div>
+                    <h3>Aucune annonce</h3>
+                    <p>Soyez le premier à publier ici</p>
+                </div>
+            </div>
+
+            <div id="account-page" class="account-page" style="display: none;">
+                <div class="account-header-card">
+                    <div class="user-avatar" id="account-avatar">J</div>
+                    <div>
+                        <div class="user-name font-display" id="account-name">Jean Kabamba</div>
+                        <span class="user-type-badge" id="account-type-badge">Client</span>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value font-display" id="stat-annonces">0</div>
+                        <div class="stat-label">Annonces</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value font-display" id="stat-favoris">0</div>
+                        <div class="stat-label">Favoris</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value font-display" id="stat-contacts">0</div>
+                        <div class="stat-label">Contacts</div>
+                    </div>
+                </div>
+
+                <div class="account-menu">
+                    <button class="account-menu-item" onclick="alert('Mes annonces : fonctionnalité à venir')">
+                        <div class="menu-icon"><i class="ti ti-notes" aria-hidden="true"></i></div>
+                        <span>Mes annonces</span>
+                    </button>
+                    <button class="account-menu-item" onclick="alert('Favoris : fonctionnalité à venir')">
+                        <div class="menu-icon"><i class="ti ti-heart" aria-hidden="true"></i></div>
+                        <span>Favoris</span>
+                    </button>
+                    <button class="account-menu-item" onclick="showMessages()">
+                        <div class="menu-icon"><i class="ti ti-history" aria-hidden="true"></i></div>
+                        <span>Historique des contacts</span>
+                    </button>
+                    <button class="account-menu-item" onclick="alert('Paramètres : fonctionnalité à venir')">
+                        <div class="menu-icon"><i class="ti ti-settings" aria-hidden="true"></i></div>
+                        <span>Paramètres</span>
+                    </button>
+                    <button class="account-menu-item" onclick="alert('Aide : fonctionnalité à venir')">
+                        <div class="menu-icon"><i class="ti ti-help-circle" aria-hidden="true"></i></div>
+                        <span>Aide & support</span>
+                    </button>
+                    <button class="account-menu-item danger" onclick="logout()">
+                        <div class="menu-icon"><i class="ti ti-logout" aria-hidden="true"></i></div>
+                        <span>Se déconnecter</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Content -->
-            <div class="content">
-                <!-- Categories View -->
-                <div id="categories-view">
-                    <div class="section-header">
-                        <h2 class="section-title">Catégories</h2>
-                    </div>
-                    <div class="categories-scroll" id="categories-scroll">
-                        <!-- Categories loaded here -->
-                    </div>
-                </div>
-
-                <!-- Listings View -->
-                <div id="listings-view" style="display: none;">
-                    <div class="filter-bar" id="filter-bar">
-                        <button class="filter-chip active" onclick="filterQuartier('')">Tous</button>
-                        <button class="filter-chip" onclick="filterQuartier('Manika')">Manika</button>
-                        <button class="filter-chip" onclick="filterQuartier('Dilala')">Dilala</button>
-                        <button class="filter-chip" onclick="filterQuartier('Musonoi')">Musonoi</button>
-                        <button class="filter-chip" onclick="filterQuartier('Gécamines')">Gécamines</button>
-                    </div>
-                    
-                    <div class="section-header">
-                        <h2 class="section-title" id="listings-title">Annonces récentes</h2>
-                        <a class="see-all" onclick="showCategories()">← Retour aux catégories</a>
-                    </div>
-                    
-                    <div class="listings-grid" id="listings-grid">
-                        <!-- Listings loaded here -->
-                    </div>
-                    
-                    <div class="empty-state" id="empty-state" style="display: none;">
-                        <div class="empty-icon">📭</div>
-                        <h3 class="empty-title">Aucune annonce</h3>
-                        <p class="empty-text">Soyez le premier à publier !</p>
-                    </div>
-                </div>
-
-                <!-- Account Page -->
-                <div id="account-page" class="account-page" style="display: none;">
-                    <div class="section-header">
-                        <h2 class="section-title">Mon compte</h2>
-                    </div>
-
-                    <div class="user-info" style="margin-bottom: 1.5rem; pointer-events: none;">
-                        <div class="user-avatar" id="account-avatar">J</div>
-                        <div class="user-details">
-                            <div class="user-name" id="account-name">Jean Kabamba</div>
-                            <span class="user-type-badge" id="account-type-badge">Client</span>
-                        </div>
-                    </div>
-
-                    <div class="account-stats">
-                        <div class="stat-card">
-                            <div class="stat-value" id="stat-annonces">0</div>
-                            <div class="stat-label">Annonces</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="stat-favoris">0</div>
-                            <div class="stat-label">Favoris</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="stat-contacts">0</div>
-                            <div class="stat-label">Contacts</div>
-                        </div>
-                    </div>
-
-                    <div class="menu-list">
-                        <div class="menu-item" onclick="alert('📝 Mes annonces : Fonctionnalité à venir')">
-                            <div class="menu-icon">📝</div>
-                            <div class="menu-content">
-                                <div class="menu-title">Mes annonces</div>
-                                <div class="menu-subtitle">Gérer mes publications</div>
-                            </div>
-                            <div class="menu-arrow">›</div>
-                        </div>
-                        <div class="menu-item" onclick="alert('⭐ Favoris : Fonctionnalité à venir')">
-                            <div class="menu-icon">⭐</div>
-                            <div class="menu-content">
-                                <div class="menu-title">Favoris</div>
-                                <div class="menu-subtitle">Annonces sauvegardées</div>
-                            </div>
-                            <div class="menu-arrow">›</div>
-                        </div>
-                        <div class="menu-item" onclick="showMessages()">
-                            <div class="menu-icon">📞</div>
-                            <div class="menu-content">
-                                <div class="menu-title">Historique</div>
-                                <div class="menu-subtitle">Mes contacts récents</div>
-                            </div>
-                            <div class="menu-arrow">›</div>
-                        </div>
-                        <div class="menu-item" onclick="alert('⚙️ Paramètres : Fonctionnalité à venir')">
-                            <div class="menu-icon">⚙️</div>
-                            <div class="menu-content">
-                                <div class="menu-title">Paramètres</div>
-                                <div class="menu-subtitle">Préférences et sécurité</div>
-                            </div>
-                            <div class="menu-arrow">›</div>
-                        </div>
-                        <div class="menu-item" onclick="alert('❓ Aide : Fonctionnalité à venir')">
-                            <div class="menu-icon">❓</div>
-                            <div class="menu-content">
-                                <div class="menu-title">Aide & Support</div>
-                                <div class="menu-subtitle">FAQ et contact</div>
-                            </div>
-                            <div class="menu-arrow">›</div>
-                        </div>
-                    </div>
-
-                    <button class="btn-logout" onclick="logout()">Se déconnecter</button>
-                </div>
-            </div>
-
-            <!-- Bottom Navigation -->
             <div class="bottom-nav">
                 <button class="nav-item active" onclick="showHome()" id="nav-home">
-                    <div class="nav-icon">🏠</div>
-                    <div class="nav-label">Accueil</div>
+                    <i class="ti ti-home icon" aria-hidden="true"></i>
+                    <span>Accueil</span>
                 </button>
                 <button class="nav-item" onclick="showSearch()" id="nav-search">
-                    <div class="nav-icon">🔍</div>
-                    <div class="nav-label">Chercher</div>
+                    <i class="ti ti-search icon" aria-hidden="true"></i>
+                    <span>Chercher</span>
                 </button>
-                <button class="nav-item" onclick="openPostModal('service')" id="nav-post">
-                    <div class="nav-icon">➕</div>
-                    <div class="nav-label">Publier</div>
+                <button class="nav-post-btn" onclick="openPostModal('service')" id="nav-post" aria-label="Publier">
+                    <i class="ti ti-plus" aria-hidden="true"></i>
                 </button>
                 <button class="nav-item" onclick="showMessages()" id="nav-messages">
-                    <div class="nav-icon">💬</div>
-                    <div class="nav-label">Messages</div>
+                    <i class="ti ti-message-circle icon" aria-hidden="true"></i>
+                    <span>Messages</span>
                 </button>
                 <button class="nav-item" onclick="showAccountPage()" id="nav-account">
-                    <div class="nav-icon">👤</div>
-                    <div class="nav-label">Compte</div>
+                    <i class="ti ti-user icon" aria-hidden="true"></i>
+                    <span>Compte</span>
                 </button>
             </div>
-
-            <!-- FAB -->
-            <button class="fab" onclick="openPostModal('service')">
-                ➕
-            </button>
         </div>
     </div>
 
@@ -2154,126 +1630,112 @@
     <!-- Post Modal -->
     <div class="modal" id="post-modal">
         <div class="modal-header">
-            <div class="modal-handle"></div>
             <h2 class="modal-title" id="modal-title">Publier une annonce</h2>
+            <button class="modal-close" onclick="closeModal()" aria-label="Fermer"><i class="ti ti-x" style="font-size:15px;" aria-hidden="true"></i></button>
         </div>
         <div class="modal-body">
             <form id="post-form">
                 <input type="hidden" id="post-type">
-                
-                <!-- Type Selector -->
+
                 <div class="form-group">
-                    <label class="form-label">Type d'annonce <span class="form-required">*</span></label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                        <button type="button" class="filter-chip active" onclick="setPostType('service')">🔧 Service</button>
-                        <button type="button" class="filter-chip" onclick="setPostType('location')">🪑 Location</button>
+                    <label class="form-label">Type d'annonce</label>
+                    <div class="type-toggle-row">
+                        <button type="button" class="type-toggle active" onclick="setPostType('service')">Service</button>
+                        <button type="button" class="type-toggle" onclick="setPostType('location')">Location</button>
                     </div>
                 </div>
 
-                <!-- Service Form -->
                 <div id="service-form">
                     <div class="form-group">
-                        <label class="form-label">Nom du prestataire <span class="form-required">*</span></label>
+                        <label class="form-label">Nom du prestataire</label>
                         <input type="text" class="form-input" id="service-name" required placeholder="Ex: Jean Électricien">
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Catégorie <span class="form-required">*</span></label>
+                        <label class="form-label">Catégorie</label>
                         <select class="form-select" id="service-category" required>
                             <option value="">Sélectionnez</option>
-                            <option value="depannage">⚡ Dépannage & Urgences</option>
-                            <option value="auto">🚗 Auto, Mécanique & Transport</option>
-                            <option value="btp">🧱 BTP & Travaux</option>
-                            <option value="beaute">💄 Beauté & Événements</option>
-                            <option value="maison">🏠 Services à domicile</option>
+                            <option value="depannage">Dépannage & Urgences</option>
+                            <option value="auto">Auto, Mécanique & Transport</option>
+                            <option value="btp">BTP & Travaux</option>
+                            <option value="beaute">Beauté & Événements</option>
+                            <option value="maison">Services à domicile</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Service proposé <span class="form-required">*</span></label>
+                        <label class="form-label">Service proposé</label>
                         <input type="text" class="form-input" id="service-type" required placeholder="Ex: Installation électrique">
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Description <span class="form-required">*</span></label>
+                        <label class="form-label">Description</label>
                         <textarea class="form-textarea" id="service-description" required placeholder="Décrivez brièvement votre service..."></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Quartier <span class="form-required">*</span></label>
-                        <select class="form-select" id="service-quartier" required>
-                            <!-- Options loaded dynamically based on selected city -->
-                        </select>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Quartier</label>
+                            <select class="form-select" id="service-quartier" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Prix indicatif</label>
+                            <input type="text" class="form-input" id="service-price" placeholder="Ex: Dès 50$">
+                        </div>
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Téléphone / WhatsApp <span class="form-required">*</span></label>
+                        <label class="form-label">Téléphone WhatsApp</label>
                         <input type="tel" class="form-input" id="service-phone" required placeholder="+243 XXX XXX XXX">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Prix indicatif</label>
-                        <input type="text" class="form-input" id="service-price" placeholder="Ex: À partir de 50$">
                     </div>
                 </div>
 
-                <!-- Location Form -->
                 <div id="location-form" style="display: none;">
                     <div class="form-group">
-                        <label class="form-label">Nom du matériel <span class="form-required">*</span></label>
+                        <label class="form-label">Nom du matériel</label>
                         <input type="text" class="form-input" id="location-name" required placeholder="Ex: Groupe électrogène 5kVA">
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Catégorie <span class="form-required">*</span></label>
+                        <label class="form-label">Catégorie</label>
                         <select class="form-select" id="location-category" required>
                             <option value="">Sélectionnez</option>
-                            <option value="energie">🔌 Énergie (Groupes, Panneaux solaires)</option>
-                            <option value="evenement">🎪 Événementiel (Chaises, Tentes, Tables)</option>
-                            <option value="vehicules">🚗 Véhicules (Voitures, Motos, Camions)</option>
+                            <option value="energie">Énergie (groupes, panneaux solaires)</option>
+                            <option value="evenement">Événementiel (chaises, tentes, tables)</option>
+                            <option value="vehicules">Véhicules (voitures, motos, camions)</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Description <span class="form-required">*</span></label>
+                        <label class="form-label">Description</label>
                         <textarea class="form-textarea" id="location-description" required placeholder="État, usage, conditions..."></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Prix par jour <span class="form-required">*</span></label>
-                        <input type="text" class="form-input" id="location-price" required placeholder="Ex: 100$ / jour">
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Quartier</label>
+                            <select class="form-select" id="location-quartier" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Prix par jour</label>
+                            <input type="text" class="form-input" id="location-price" required placeholder="Ex: 100$/jour">
+                        </div>
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Quartier <span class="form-required">*</span></label>
-                        <select class="form-select" id="location-quartier" required>
-                            <!-- Options loaded dynamically based on selected city -->
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Téléphone / WhatsApp <span class="form-required">*</span></label>
+                        <label class="form-label">Téléphone WhatsApp</label>
                         <input type="tel" class="form-input" id="location-phone" required placeholder="+243 XXX XXX XXX">
                     </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Caution demandée ?</label>
-                        <select class="form-select" id="location-caution">
-                            <option value="non">Non</option>
-                            <option value="oui">Oui</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Livraison possible ?</label>
-                        <select class="form-select" id="location-livraison">
-                            <option value="non">Non</option>
-                            <option value="oui">Oui</option>
-                        </select>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Caution demandée</label>
+                            <select class="form-select" id="location-caution">
+                                <option value="non">Non</option>
+                                <option value="oui">Oui</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Livraison possible</label>
+                            <select class="form-select" id="location-livraison">
+                                <option value="non">Non</option>
+                                <option value="oui">Oui</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn-submit">Publier l'annonce</button>
+
+                <button type="submit" class="btn-primary">Publier l'annonce</button>
             </form>
         </div>
     </div>
@@ -2281,115 +1743,92 @@
     <!-- Notifications Panel -->
     <div class="notifications-panel" id="notifications-panel">
         <div class="notifications-header">
-            <div class="notifications-title">
-                🔔 Notifications
-                <span class="notification-count" id="notification-count">0</span>
-            </div>
-            <button class="btn-close-notifications" onclick="closeNotifications()">✕</button>
+            <h2>Notifications <span class="notification-count" id="notification-count">0</span></h2>
+            <button class="modal-close" onclick="closeNotifications()" aria-label="Fermer"><i class="ti ti-x" style="font-size:15px;" aria-hidden="true"></i></button>
         </div>
-        <div class="notifications-body" id="notifications-body">
-            <!-- Notifications loaded here -->
-        </div>
-        <div class="notifications-footer">
-            <button class="btn-mark-all-read" onclick="markAllAsRead()">Tout marquer comme lu</button>
+        <div class="notifications-body" id="notifications-body"></div>
+        <div style="padding:14px 20px;">
+            <button class="btn-primary" style="background:var(--white);color:var(--navy);border:1.5px solid var(--border);" onclick="markAllAsRead()">Tout marquer comme lu</button>
         </div>
     </div>
 
     <!-- Reviews Detail Modal -->
     <div class="reviews-modal" id="reviews-modal">
         <div class="reviews-modal-header">
-            <button class="btn-back-reviews" onclick="closeReviewsModal()">←</button>
+            <button class="back-btn" onclick="closeReviewsModal()" aria-label="Retour"><i class="ti ti-arrow-left" style="font-size:16px;" aria-hidden="true"></i></button>
             <div class="reviews-modal-title" id="reviews-modal-title">Tous les avis</div>
+            <div style="width:34px;"></div>
         </div>
-        <div class="reviews-modal-body" id="reviews-modal-body">
-            <!-- Reviews content loaded here -->
-        </div>
+        <div class="reviews-modal-body" id="reviews-modal-body"></div>
     </div>
 
     <!-- Rating Modal -->
     <div class="rating-modal" id="rating-modal">
         <div class="rating-modal-header">
-            <div class="modal-handle"></div>
-            <h2 class="rating-modal-title" id="rating-modal-title">Comment s'est passé le service ?</h2>
+            <h2 class="rating-modal-title font-display" id="rating-modal-title">Comment s'est passé le service ?</h2>
             <p class="rating-modal-subtitle" id="rating-modal-subtitle">Notez votre expérience avec ce prestataire</p>
         </div>
         <div class="rating-modal-body" id="rating-modal-content">
             <form id="rating-form">
                 <input type="hidden" id="rating-listing-id">
-                
-                <div class="rating-criteria">
-                    <!-- Criterion 1 -->
-                    <div class="rating-criterion">
-                        <label class="criterion-label" id="criterion-1-label">Qualité du travail</label>
-                        <div class="star-rating" data-criterion="1">
-                            <span class="star" data-value="1">☆</span>
-                            <span class="star" data-value="2">☆</span>
-                            <span class="star" data-value="3">☆</span>
-                            <span class="star" data-value="4">☆</span>
-                            <span class="star" data-value="5">☆</span>
-                        </div>
-                    </div>
 
-                    <!-- Criterion 2 -->
-                    <div class="rating-criterion">
-                        <label class="criterion-label" id="criterion-2-label">Professionnalisme</label>
-                        <div class="star-rating" data-criterion="2">
-                            <span class="star" data-value="1">☆</span>
-                            <span class="star" data-value="2">☆</span>
-                            <span class="star" data-value="3">☆</span>
-                            <span class="star" data-value="4">☆</span>
-                            <span class="star" data-value="5">☆</span>
-                        </div>
+                <div class="rating-criterion">
+                    <label class="criterion-label" id="criterion-1-label">Qualité du travail</label>
+                    <div class="star-rating" data-criterion="1">
+                        <span class="star" data-value="1">☆</span>
+                        <span class="star" data-value="2">☆</span>
+                        <span class="star" data-value="3">☆</span>
+                        <span class="star" data-value="4">☆</span>
+                        <span class="star" data-value="5">☆</span>
                     </div>
-
-                    <!-- Criterion 3 -->
-                    <div class="rating-criterion">
-                        <label class="criterion-label" id="criterion-3-label">Ponctualité</label>
-                        <div class="star-rating" data-criterion="3">
-                            <span class="star" data-value="1">☆</span>
-                            <span class="star" data-value="2">☆</span>
-                            <span class="star" data-value="3">☆</span>
-                            <span class="star" data-value="4">☆</span>
-                            <span class="star" data-value="5">☆</span>
-                        </div>
+                </div>
+                <div class="rating-criterion">
+                    <label class="criterion-label" id="criterion-2-label">Professionnalisme</label>
+                    <div class="star-rating" data-criterion="2">
+                        <span class="star" data-value="1">☆</span>
+                        <span class="star" data-value="2">☆</span>
+                        <span class="star" data-value="3">☆</span>
+                        <span class="star" data-value="4">☆</span>
+                        <span class="star" data-value="5">☆</span>
                     </div>
-
-                    <!-- Criterion 4 -->
-                    <div class="rating-criterion">
-                        <label class="criterion-label">Rapport qualité/prix</label>
-                        <div class="star-rating" data-criterion="4">
-                            <span class="star" data-value="1">☆</span>
-                            <span class="star" data-value="2">☆</span>
-                            <span class="star" data-value="3">☆</span>
-                            <span class="star" data-value="4">☆</span>
-                            <span class="star" data-value="5">☆</span>
-                        </div>
+                </div>
+                <div class="rating-criterion">
+                    <label class="criterion-label" id="criterion-3-label">Ponctualité</label>
+                    <div class="star-rating" data-criterion="3">
+                        <span class="star" data-value="1">☆</span>
+                        <span class="star" data-value="2">☆</span>
+                        <span class="star" data-value="3">☆</span>
+                        <span class="star" data-value="4">☆</span>
+                        <span class="star" data-value="5">☆</span>
+                    </div>
+                </div>
+                <div class="rating-criterion">
+                    <label class="criterion-label">Rapport qualité/prix</label>
+                    <div class="star-rating" data-criterion="4">
+                        <span class="star" data-value="1">☆</span>
+                        <span class="star" data-value="2">☆</span>
+                        <span class="star" data-value="3">☆</span>
+                        <span class="star" data-value="4">☆</span>
+                        <span class="star" data-value="5">☆</span>
                     </div>
                 </div>
 
-                <div class="rating-comment">
-                    <label class="comment-label">Votre commentaire (optionnel)</label>
-                    <textarea 
-                        class="comment-textarea" 
-                        id="rating-comment" 
-                        maxlength="200" 
-                        placeholder="Partagez votre expérience..."
-                        oninput="updateCommentCounter()"></textarea>
-                    <div class="comment-counter">
-                        <span id="comment-count">0</span>/200 caractères
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Votre commentaire (optionnel)</label>
+                    <textarea class="form-textarea" id="rating-comment" maxlength="200" placeholder="Partagez votre expérience..." oninput="updateCommentCounter()"></textarea>
+                    <div class="comment-counter"><span id="comment-count">0</span>/200 caractères</div>
                 </div>
 
                 <div class="quick-tags">
-                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Très professionnel</button>
-                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Travail soigné</button>
-                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Rapide</button>
-                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ À l'heure</button>
-                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Bon prix</button>
-                    <button type="button" class="quick-tag" onclick="toggleTag(this)">✅ Je recommande</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">Très professionnel</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">Travail soigné</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">Rapide</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">À l'heure</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">Bon prix</button>
+                    <button type="button" class="quick-tag" onclick="toggleTag(this)">Je recommande</button>
                 </div>
 
-                <button type="submit" class="btn-submit-rating" id="submit-rating-btn">Publier mon avis ⭐</button>
+                <button type="submit" class="btn-submit-rating" id="submit-rating-btn">Publier mon avis</button>
             </form>
         </div>
     </div>
@@ -2476,17 +1915,23 @@
         // Categories
         const categories = {
             services: [
-                { id: 'depannage', icon: '⚡', title: 'Dépannage\n& Urgences' },
-                { id: 'auto', icon: '🚗', title: 'Auto, Mécanique\n& Transport' },
-                { id: 'btp', icon: '🧱', title: 'BTP\n& Travaux' },
-                { id: 'beaute', icon: '💄', title: 'Beauté\n& Événements' },
-                { id: 'maison', icon: '🏠', title: 'Services\nà domicile' }
+                { id: 'depannage', icon: 'ti-bolt', colorClass: 'cat-depannage', title: 'Dépannage & Urgences' },
+                { id: 'auto', icon: 'ti-car', colorClass: 'cat-auto', title: 'Auto, Mécanique & Transport' },
+                { id: 'btp', icon: 'ti-building', colorClass: 'cat-btp', title: 'BTP & Travaux' },
+                { id: 'beaute', icon: 'ti-scissors', colorClass: 'cat-beaute', title: 'Beauté & Événements' },
+                { id: 'maison', icon: 'ti-home', colorClass: 'cat-maison', title: 'Services à domicile' }
             ],
             location: [
-                { id: 'energie', icon: '🔌', title: 'Énergie' },
-                { id: 'evenement', icon: '🎪', title: 'Événementiel' },
-                { id: 'vehicules', icon: '🚗', title: 'Véhicules' }
+                { id: 'energie', icon: 'ti-plug', colorClass: 'cat-energie', title: 'Énergie' },
+                { id: 'evenement', icon: 'ti-tent', colorClass: 'cat-evenement', title: 'Événementiel' },
+                { id: 'vehicules', icon: 'ti-car', colorClass: 'cat-vehicules', title: 'Véhicules' }
             ]
+        };
+
+        const categoryIconMap = {
+            depannage: 'ti-bolt', auto: 'ti-car', btp: 'ti-building',
+            beaute: 'ti-scissors', maison: 'ti-home',
+            energie: 'ti-plug', evenement: 'ti-tent', vehicules: 'ti-car'
         };
 
         // Note : les annonces d'exemple ne sont plus codées en dur ici.
@@ -2907,10 +2352,10 @@
             const cats = categories[currentTab];
             
             container.innerHTML = cats.map(cat => `
-                <div class="category-chip" onclick="showListings('${cat.id}')">
-                    <div class="category-chip-icon">${cat.icon}</div>
-                    <div class="category-chip-label">${cat.title}</div>
-                </div>
+                <button class="category-chip" onclick="showListings('${cat.id}')">
+                    <div class="cat-icon-wrap ${cat.colorClass}"><i class="ti ${cat.icon}" aria-hidden="true"></i></div>
+                    <div class="cat-label">${cat.title}</div>
+                </button>
             `).join('');
         }
 
@@ -2922,7 +2367,7 @@
             document.getElementById('account-page').style.display = 'none';
             
             const category = categories[currentTab].find(c => c.id === categoryId);
-            document.getElementById('listings-title').textContent = category.title.replace('\n', ' ');
+            document.getElementById('listings-title').textContent = category.title;
             
             document.querySelectorAll('#filter-bar .filter-chip').forEach(chip => {
                 chip.classList.toggle('active', chip.textContent === 'Tous');
@@ -2957,20 +2402,22 @@
                 grid.style.display = 'none';
                 emptyState.style.display = 'block';
             } else {
-                grid.style.display = 'grid';
+                grid.style.display = 'flex';
                 emptyState.style.display = 'none';
                 
-                grid.innerHTML = filtered.map(listing => `
+                grid.innerHTML = filtered.map(listing => {
+                    const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+                    return `
                     <div class="listing-card">
                         <div class="listing-image">
+                            <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
                             <div class="listing-badge">${listing.type === 'service' ? 'SERVICE' : 'LOCATION'}</div>
-                            ${listing.icon}
                         </div>
                         <div class="listing-content">
                             <h3 class="listing-title">${listing.name}</h3>
                             <div class="listing-meta">
                                 <div class="listing-location">
-                                    <span>📍</span>
+                                    <i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i>
                                     <span>${listing.quartier}</span>
                                 </div>
                                 ${listing.service ? `
@@ -2983,13 +2430,13 @@
                             <div class="listing-footer">
                                 <div class="listing-price">${listing.price}</div>
                                 <button class="btn-contact" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
-                                    <span>💬</span>
+                                    <i class="ti ti-brand-whatsapp" style="font-size:14px;" aria-hidden="true"></i>
                                     <span>Contacter</span>
                                 </button>
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `;}).join('');
             }
         }
 
@@ -3181,12 +2628,16 @@
         });
 
         function getIconForCategory(category) {
-            const icons = {
-                'depannage': '⚡', 'auto': '🚗', 'btp': '🧱',
-                'beaute': '💄', 'maison': '🏠',
-                'energie': '🔌', 'evenement': '🎪', 'vehicules': '🚗'
+            return categoryIconMap[category] || 'ti-package';
+        }
+
+        function getColorClassForCategory(category) {
+            const colors = {
+                depannage: 'cat-depannage', auto: 'cat-auto', btp: 'cat-btp',
+                beaute: 'cat-beaute', maison: 'cat-maison',
+                energie: 'cat-energie', evenement: 'cat-evenement', vehicules: 'cat-vehicules'
             };
-            return icons[category] || '📦';
+            return colors[category] || 'cat-maison';
         }
 
         // ========== REVIEWS DETAIL MODAL ==========
@@ -3793,11 +3244,11 @@
             const rating = getListingRating(listingId);
             
             if (rating.count === 0) {
-                return '<span class="rating-display" style="color: var(--text-light); font-weight: 500;">Pas encore d\'avis</span>';
+                return '<span style="font-size:11.5px;color:var(--text-light);display:block;margin-bottom:8px;">Pas encore d\'avis</span>';
             }
 
             const stars = '★'.repeat(Math.round(rating.average));
-            const topBadge = rating.average >= 4.8 && rating.count >= 10 ? '<span class="top-badge">🏆 Top</span>' : '';
+            const topBadge = rating.average >= 4.8 && rating.count >= 10 ? '<span class="top-badge"><i class="ti ti-trophy" style="font-size:10px;" aria-hidden="true"></i> Top</span>' : '';
             
             return `
                 <div class="rating-display" onclick="openReviewsModal(${listingId})" style="cursor: pointer;">
@@ -3860,5 +3311,4 @@
         // Initialize
         init();
     </script>
-</body>
-</html>
+</body></html>
