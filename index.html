@@ -2744,10 +2744,10 @@
                         const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
                         return `
                         <div class="listing-card">
-                            <div class="listing-image">
+                            <div class="listing-image" onclick="openListingDetail(${listing.id})">
                                 <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
                             </div>
-                            <div class="listing-content">
+                            <div class="listing-content" onclick="openListingDetail(${listing.id})" style="cursor:pointer;">
                                 <h3 class="listing-title">${listing.name}</h3>
                                 <div class="listing-meta">
                                     <div class="listing-location"><i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i><span>${listing.quartier}</span></div>
@@ -2757,10 +2757,10 @@
                                 <div class="listing-footer">
                                     <div class="listing-price">${listing.price}</div>
                                     <div style="display:flex;gap:8px;">
-                                        <button class="btn-contact" style="background:var(--white);color:var(--danger);border:1.5px solid var(--border);" onclick="toggleFavorite(${listing.id}, true)">
+                                        <button class="btn-contact" style="background:var(--white);color:var(--danger);border:1.5px solid var(--border);" onclick="event.stopPropagation(); toggleFavorite(${listing.id}, true)">
                                             <i class="ti ti-heart-off" style="font-size:14px;" aria-hidden="true"></i>
                                         </button>
-                                        <button class="btn-contact" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
+                                        <button class="btn-contact" onclick="event.stopPropagation(); handleContactClick(${listing.id}, '${listing.phone}')">
                                             <i class="ti ti-brand-whatsapp" style="font-size:14px;" aria-hidden="true"></i>
                                         </button>
                                     </div>
@@ -2853,6 +2853,7 @@
             }
 
             await loadRatingsCache();
+            await loadFavoritesCache();
 
             const results = listings.filter(l =>
                 l.city === currentCity && (
@@ -2877,12 +2878,16 @@
 
             container.innerHTML = results.map(listing => {
                 const iconClass = listing.icon && listing.icon.startsWith('ti-') ? listing.icon : getIconForCategory(listing.category);
+                const isFav = favoritesCache.has(listing.id);
                 return `
                 <div class="listing-card">
-                    <div class="listing-image">
+                    <button class="listing-fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${listing.id}, ${isFav})" aria-label="Favori">
+                        <i class="ti ${isFav ? 'ti-heart-filled' : 'ti-heart'}" aria-hidden="true"></i>
+                    </button>
+                    <div class="listing-image" onclick="openListingDetail(${listing.id})">
                         <i class="ti ${iconClass}" style="color:var(--orange);font-size:22px;" aria-hidden="true"></i>
                     </div>
-                    <div class="listing-content">
+                    <div class="listing-content" onclick="openListingDetail(${listing.id})" style="cursor:pointer;">
                         <h3 class="listing-title">${listing.name}</h3>
                         <div class="listing-meta">
                             <div class="listing-location"><i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i><span>${listing.quartier}</span></div>
@@ -2891,7 +2896,7 @@
                         <p class="listing-description">${listing.description}</p>
                         <div class="listing-footer">
                             <div class="listing-price">${listing.price}</div>
-                            <button class="btn-contact" onclick="handleContactClick(${listing.id}, '${listing.phone}')">
+                            <button class="btn-contact" onclick="event.stopPropagation(); handleContactClick(${listing.id}, '${listing.phone}')">
                                 <i class="ti ti-brand-whatsapp" style="font-size:14px;" aria-hidden="true"></i>
                                 <span>Contacter</span>
                             </button>
@@ -3082,8 +3087,9 @@
             await loadRatingsCache();
             await loadFavoritesCache();
             
+            const tabToType = { services: 'service', location: 'location' };
             let filtered = listings.filter(l => 
-                l.type === currentTab && 
+                l.type === tabToType[currentTab] && 
                 l.category === currentCategory &&
                 l.city === currentCity &&
                 (!currentQuartier || l.quartier === currentQuartier)
