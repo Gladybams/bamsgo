@@ -1388,7 +1388,7 @@
             font-weight: 600;
         }
 
-        .reviews-modal-body { padding: 20px; }
+        .reviews-modal-body { padding: 20px 20px 32px; }
 
         .reviews-summary {
             text-align: center;
@@ -2493,14 +2493,16 @@
         // ============================================
         // Signalement d'annonce (modération)
         // ============================================
-        async function openReportModal(listingId, listingName) {
+        async function openReportModal(listingId) {
             if (!currentUser) {
                 showToast('Connectez-vous pour signaler une annonce.', 'info');
                 return;
             }
 
-            // On empêche l'auteur de se signaler lui-même
             const listing = listings.find(l => l.id === listingId);
+            const listingName = listing ? listing.name : '';
+
+            // On empêche l'auteur de se signaler lui-même
             if (listing && listing.user_id === currentUser.phone) {
                 showToast('Vous ne pouvez pas signaler votre propre annonce.', 'warning');
                 return;
@@ -4117,8 +4119,8 @@
                     </button>
                 </div>
 
-                <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
-                    <button type="button" onclick="openReportModal(${listing.id}, ${JSON.stringify(listing.name)})" style="background:none;border:0;font-size:12px;color:var(--text-light);cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                <div style="text-align:center;margin-top:20px;padding-top:16px;padding-bottom:8px;border-top:1px solid var(--border);">
+                    <button type="button" onclick="openReportModal(${listing.id})" style="background:none;border:0;font-size:12px;color:var(--text-light);cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
                         <i class="ti ti-flag" style="font-size:13px;" aria-hidden="true"></i>
                         <span>Un problème avec cette annonce ? Signaler</span>
                     </button>
